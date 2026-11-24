@@ -1,8 +1,8 @@
-import { initPage, $, el, qs, cleanSearch, fillPrefectureSelect, fillOptions, JOB_TYPES, JP_LEVELS } from "../ui.js";
+import { initPage, $, el, qs, isUuid, cleanSearch, fillPrefectureSelect, fillOptions, JOB_TYPES, JP_LEVELS } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
 import { CONFIG } from "../config.js";
-import { jobCard, JOB_CARD_COLUMNS } from "../cards.js";
+import { jobCard, emptyRow, JOB_CARD_COLUMNS } from "../cards.js";
 
 await initPage();
 const form = $("#filters");
@@ -15,11 +15,12 @@ $("#q").value = qs("q") || "";
 $("#pref").value = qs("pref") || "";
 $("#type").value = qs("type") || "";
 $("#jp").value = qs("jp") || "";
+const emp = isUuid(qs("emp")) ? qs("emp") : null;
 let page = Math.max(0, parseInt(qs("page") || "0", 10) || 0);
 
 async function load() {
   const results = $("#results");
-  results.replaceChildren(el("p", { class: "meta" }, t("common.loading")));
+  results.replaceChildren(emptyRow(t("common.loading")));
   const per = CONFIG.JOBS_PER_PAGE;
   let query = sb.from("jobs").select(JOB_CARD_COLUMNS, { count: "exact" })
     .eq("status", "live").order("created_at", { ascending: false })
@@ -27,6 +28,7 @@ async function load() {
 
   const q = cleanSearch($("#q").value);
   if (q) query = query.or(`title.ilike.*${q}*,description.ilike.*${q}*`);
+  if (emp) query = query.eq("employer_id", emp);
   if ($("#pref").value) query = query.eq("prefecture", $("#pref").value);
   if (JOB_TYPES.includes($("#type").value)) query = query.eq("job_type", $("#type").value);
   const jp = $("#jp").value;
@@ -37,9 +39,9 @@ async function load() {
   }
 
   const { data, error, count } = await query;
-  if (error) { results.replaceChildren(el("p", { class: "msg err" }, t("common.error"))); return; }
+  if (error) { results.replaceChildren(emptyRow(t("common.error"))); return; }
   $("#count").textContent = t("jobs.count", { n: count ?? 0 });
-  results.replaceChildren(...(data.length ? data.map(jobCard) : [el("p", { class: "meta" }, t("jobs.none"))]));
+  results.replaceChildren(...(data.length ? data.map(jobCard) : [emptyRow(t("jobs.none"))]));
   $("#prev").disabled = page === 0;
   $("#next").disabled = (page + 1) * per >= (count ?? 0);
 }
@@ -47,6 +49,7 @@ async function load() {
 function pushState() {
   const p = new URLSearchParams();
   for (const k of ["q", "pref", "type", "jp"]) if ($(`#${k}`).value) p.set(k, $(`#${k}`).value);
+  if (emp) p.set("emp", emp);
   if (page) p.set("page", page);
   history.replaceState(null, "", `?${p}`);
 }

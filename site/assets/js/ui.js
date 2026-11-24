@@ -116,49 +116,66 @@ export async function initPage() {
 function renderHeader(profile) {
   const host = $("#site-header");
   if (!host) return;
-  const langSel = el("select", { class: "lang-select", "aria-label": "Language", onchange: (e) => setLang(e.target.value) });
-  for (const [code, name] of Object.entries(LANGS)) {
-    const o = el("option", { value: code }, name);
-    if (code === currentLang()) o.selected = true;
-    langSel.append(o);
+
+  // Safety strip above the header: the one message every visitor must see
+  if (!document.querySelector(".safety-strip")) {
+    host.before(el("div", { class: "safety-strip" }, el("div", { class: "wrap" },
+      el("strong", {}, t("safety.title")), " ", t("safety.text"))));
   }
-  const nav = el("nav", { class: "nav" }, el("a", { href: p("jobs.html") }, t("nav.jobs")));
+
+  const langs = el("div", { class: "lang-switch", role: "group", "aria-label": "Language" });
+  for (const [code, name] of Object.entries(LANGS)) {
+    langs.append(el("button", { type: "button", lang: code, "aria-pressed": String(code === currentLang()), onclick: () => setLang(code) }, name));
+  }
+
+  const nav = el("nav", { class: "nav", "aria-label": "Main" }, el("a", { href: p("jobs.html") }, t("nav.jobs")));
   if (profile) {
-    if (profile.role === "employer") nav.append(el("a", { href: p("post-job.html") }, t("nav.post_job")));
     nav.append(el("a", { href: p("dashboard.html") }, t("nav.dashboard")));
     if (profile.role === "admin") nav.append(el("a", { href: p("admin.html") }, t("nav.admin")));
     nav.append(el("button", { class: "linklike", onclick: async () => { await sb.auth.signOut(); location.href = p(""); } }, t("nav.logout")));
+    if (profile.role === "employer") nav.append(el("a", { class: "btn gold small", href: p("post-job.html") }, t("nav.post_job")));
   } else {
-    nav.append(el("a", { href: p("login.html") }, t("nav.login")), el("a", { href: p("signup.html") }, t("nav.signup")));
+    nav.append(
+      el("a", { href: p("login.html") }, t("nav.login")),
+      el("a", { class: "btn small", href: p("signup.html") }, t("nav.signup")),
+    );
   }
-  nav.append(langSel);
-  const [a, b] = splitName(CONFIG.SITE_NAME);
-  host.className = "site-header";
-  host.replaceChildren(el("div", { class: "wrap" }, el("a", { class: "brand", href: p("") }, a, el("span", {}, b)), nav));
-}
+  nav.append(langs);
 
-function splitName(name) {
-  const i = name.lastIndexOf(" ");
-  return i > 0 ? [name.slice(0, i + 1), name.slice(i + 1)] : [name, ""];
+  host.className = "site-header";
+  host.replaceChildren(el("div", { class: "wrap bar" },
+    el("a", { class: "brand", href: p("") },
+      el("span", { class: "brand-mark", "aria-hidden": "true" }),
+      el("span", { class: "brand-name" }, CONFIG.SITE_NAME, el("small", {}, t("brand.tagline")))),
+    nav));
 }
 
 function renderFooter() {
   const host = $("#site-footer");
   if (!host) return;
   host.className = "site-footer";
-  const links = el("div", { class: "links" },
-    el("a", { href: p("about.html") }, t("footer.about")),
-    el("a", { href: p("legal/seeker-guide.html") }, t("footer.guide")),
-    el("a", { href: p("legal/posting-rules.html") }, t("footer.rules")),
-    el("a", { href: p("legal/terms.html") }, t("footer.terms")),
-    el("a", { href: p("legal/privacy.html") }, t("footer.privacy")),
-    el("a", { href: `mailto:${CONFIG.CONTACT_EMAIL}` }, t("footer.contact")),
+  const col = (title, ...links) => el("div", {}, el("h4", {}, title), ...links);
+  const legal = [t("footer.notice")];
+  if (CONFIG.OPERATOR_NAME) legal.push(` ${t("footer.operator")}: ${CONFIG.OPERATOR_NAME}.`);
+  if (CONFIG.MHLW_NUMBER) legal.push(` ${t("footer.mhlw")}: ${CONFIG.MHLW_NUMBER}.`);
+  host.replaceChildren(
+    el("div", { class: "acheik", "aria-hidden": "true" }),
+    el("div", { class: "wrap" },
+      el("div", {}, el("h4", {}, CONFIG.SITE_NAME), el("p", {}, t("footer.about_text"))),
+      col(t("footer.seekers"),
+        el("a", { href: p("jobs.html") }, t("nav.jobs")),
+        el("a", { href: p("legal/seeker-guide.html") }, t("footer.guide")),
+        el("a", { href: p("signup.html?role=seeker") }, t("home.cta_seeker"))),
+      col(t("footer.company"),
+        el("a", { href: p("signup.html?role=employer") }, t("home.cta_employer")),
+        el("a", { href: p("legal/posting-rules.html") }, t("footer.rules")),
+        el("a", { href: p("about.html") }, t("footer.about")),
+        el("a", { href: p("legal/terms.html") }, t("footer.terms")),
+        el("a", { href: p("legal/privacy.html") }, t("footer.privacy")),
+        el("a", { href: `mailto:${CONFIG.CONTACT_EMAIL}` }, t("footer.contact"))),
+      el("div", { class: "legal-line" }, ...legal, ` © ${new Date().getFullYear()} ${CONFIG.SITE_NAME}`),
+    ),
   );
-  const lines = [el("div", {}, t("footer.notice"))];
-  if (CONFIG.OPERATOR_NAME) lines.push(el("div", {}, `${t("footer.operator")}: ${CONFIG.OPERATOR_NAME}`));
-  if (CONFIG.MHLW_NUMBER) lines.push(el("div", {}, `${t("footer.mhlw")}: ${CONFIG.MHLW_NUMBER}`));
-  lines.push(el("div", {}, `© ${new Date().getFullYear()} ${CONFIG.SITE_NAME}`));
-  host.replaceChildren(el("div", { class: "wrap" }, links, ...lines));
 }
 
 /** Redirect to login if not signed in, or home if wrong role. */

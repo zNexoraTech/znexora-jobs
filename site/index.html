@@ -9,37 +9,87 @@
 <title>Jobs for the Myanmar community in Japan | ZNexora Jobs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Myanmar:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <header id="site-header" class="site-header"></header>
 <section class="hero">
   <div class="wrap">
-    <h1 data-i18n="home.title">Jobs in Japan for the Myanmar community</h1>
-    <p data-i18n="home.subtitle">Find full-time and part-time jobs, or hire Myanmar talent.</p>
-    <form id="search" class="search-bar" action="jobs.html" method="get">
-      <input type="text" name="q" maxlength="60" data-i18n-placeholder="home.search_placeholder" aria-label="Keyword">
-      <select name="pref" id="pref" aria-label="Prefecture"></select>
-      <button type="submit" data-i18n="home.search_btn">Search</button>
+    <div>
+      <h1 data-i18n="home.title">Jobs in Japan for the Myanmar community</h1>
+      <p class="lead" data-i18n="home.subtitle">Find full-time and part-time work with employers who welcome Myanmar staff. Free for job seekers, in Burmese, English and Japanese.</p>
+      <p id="hero-count" class="hero-count"></p>
+    </div>
+    <form id="search" class="search-panel" action="jobs.html" method="get">
+      <div class="field">
+        <label for="q" data-i18n="filter.keyword">Keyword</label>
+        <input type="text" id="q" name="q" maxlength="60" data-i18n-placeholder="home.search_placeholder">
+      </div>
+      <div class="field">
+        <label for="pref" data-i18n="filter.prefecture">Prefecture</label>
+        <select name="pref" id="pref"></select>
+      </div>
+      <button type="submit" data-i18n="home.search_btn">Search jobs</button>
     </form>
   </div>
+  <div class="acheik" aria-hidden="true"></div>
 </section>
+
 <main class="wrap">
-  <div class="row"><h2 data-i18n="home.latest">Latest jobs</h2><span class="spacer"></span><a href="jobs.html" data-i18n="home.view_all">View all jobs</a></div>
-  <div id="latest" class="grid grid-3"></div>
-  <div class="grid grid-2 u-mt32">
+  <section class="section" aria-labelledby="shortcuts-h">
+    <div class="section-head"><h2 id="shortcuts-h" data-i18n="home.shortcuts">Find jobs that fit you</h2></div>
+    <nav class="shortcuts" aria-labelledby="shortcuts-h">
+      <a class="shortcut" href="jobs.html?jp=none"><strong data-i18n="short.no_japanese">Japanese not required</strong><span data-i18n="short.no_japanese_sub">Start working while you learn</span></a>
+      <a class="shortcut" href="jobs.html?type=arubaito"><strong data-i18n="short.arubaito">Arubaito</strong><span data-i18n="short.arubaito_sub">Part-time, flexible shifts</span></a>
+      <a class="shortcut" href="jobs.html?type=full_time"><strong data-i18n="short.full_time">Full-time</strong><span data-i18n="short.full_time_sub">Stable work and visa paths</span></a>
+      <a class="shortcut" href="jobs.html?jp=N3"><strong data-i18n="short.n3">Up to N3</strong><span data-i18n="short.n3_sub">Jobs for everyday Japanese</span></a>
+      <a class="shortcut" href="jobs.html?pref=Tokyo"><strong data-i18n="short.tokyo">Tokyo</strong><span data-i18n="short.tokyo_sub">Most jobs are here</span></a>
+      <a class="shortcut" href="jobs.html?pref=Osaka"><strong data-i18n="short.osaka">Osaka</strong><span data-i18n="short.osaka_sub">Kansai area</span></a>
+      <a class="shortcut" href="jobs.html?pref=Aichi"><strong data-i18n="short.aichi">Aichi</strong><span data-i18n="short.aichi_sub">Factories and manufacturing</span></a>
+    </nav>
+  </section>
+
+  <section class="section" aria-labelledby="latest-h">
+    <div class="section-head"><h2 id="latest-h" data-i18n="home.latest">Latest jobs</h2><span class="spacer"></span><a href="jobs.html" data-i18n="home.view_all">See all jobs</a></div>
+    <div id="latest" class="job-list"></div>
+  </section>
+
+  <section class="section split">
     <div class="card">
-      <h3 data-i18n="home.for_seekers">For job seekers</h3>
-      <p data-i18n="home.for_seekers_text">Free to use. Create a profile, apply in a few clicks, and track your applications.</p>
-      <a class="btn" href="signup.html?role=seeker" data-i18n="home.cta_seeker">Create a free account</a>
+      <h2 data-i18n="home.how_title">How it works for job seekers</h2>
+      <ol class="steps">
+        <li><div><strong data-i18n="home.step1">Create a free account</strong><span data-i18n="home.step1_sub">Add your Japanese level, skills and the work you want.</span></div></li>
+        <li><div><strong data-i18n="home.step2">Apply in a few taps</strong><span data-i18n="home.step2_sub">Send a short message and your CV if you have one.</span></div></li>
+        <li><div><strong data-i18n="home.step3">Hear back from the employer</strong><span data-i18n="home.step3_sub">Track every application in your dashboard.</span></div></li>
+      </ol>
+      <p><a class="btn" href="signup.html?role=seeker" data-i18n="home.cta_seeker">Create a free account</a></p>
     </div>
-    <div class="card">
-      <h3 data-i18n="home.for_employers">For employers</h3>
-      <p data-i18n="home.for_employers_text">Reach Myanmar job seekers across Japan. Post jobs after a quick company check.</p>
-      <a class="btn secondary" href="signup.html?role=employer" data-i18n="home.cta_employer">Register as an employer</a>
+    <aside class="employer-panel">
+      <h2 data-i18n="home.for_employers">Hiring Myanmar staff?</h2>
+      <ul>
+        <li data-i18n="home.emp_point1">Reach job seekers across Japan in their own language</li>
+        <li data-i18n="home.emp_point2">Every company is checked before jobs go live</li>
+        <li data-i18n="home.emp_point3">See applicants and CVs in one place</li>
+      </ul>
+      <a class="btn gold" href="signup.html?role=employer" data-i18n="home.cta_employer">Register as an employer</a>
+    </aside>
+  </section>
+
+  <section class="section" aria-labelledby="employers-h" id="employers-section">
+    <div class="section-head"><h2 id="employers-h" data-i18n="home.employers">Companies hiring now</h2></div>
+    <div id="employers" class="employers"></div>
+  </section>
+
+  <section class="section" aria-labelledby="guides-h">
+    <div class="section-head"><h2 id="guides-h" data-i18n="home.guides">Work in Japan with confidence</h2></div>
+    <div class="guides">
+      <a class="guide" href="legal/seeker-guide.html#work-limits"><strong data-i18n="guide.limits">How much can I work on my visa?</strong><span data-i18n="guide.limits_sub">Work rules for students and other statuses</span></a>
+      <a class="guide" href="legal/seeker-guide.html#rirekisho"><strong data-i18n="guide.cv">Writing a Japanese CV (rirekisho)</strong><span data-i18n="guide.cv_sub">What to include and what to leave out</span></a>
+      <a class="guide" href="legal/seeker-guide.html#no-fees"><strong data-i18n="guide.fees">Never pay to get a job</strong><span data-i18n="guide.fees_sub">How to spot scams and report them</span></a>
+      <a class="guide" href="legal/seeker-guide.html#rights"><strong data-i18n="guide.rights">Your rights at work</strong><span data-i18n="guide.rights_sub">Minimum wage, contracts and free help</span></a>
     </div>
-  </div>
+  </section>
 </main>
 <footer id="site-footer" class="site-footer"></footer>
 <script type="module" src="assets/js/pages/home.js"></script>
