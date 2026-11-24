@@ -46,6 +46,7 @@ async function load() {
   if (error) { results.replaceChildren(emptyRow(t("common.error"))); return; }
   $("#count").textContent = t("jobs.count", { n: count ?? 0 });
   results.replaceChildren(...(data.length ? data.map(jobCard) : [emptyRow(t("jobs.none"))]));
+  loadOtherSites();
   $("#prev").disabled = page === 0;
   $("#next").disabled = (page + 1) * per >= (count ?? 0);
 }
@@ -78,3 +79,36 @@ $("#save-alert").addEventListener("click", async () => {
   if (error) showMsg("#alert-msg", /maximum/.test(error.message) ? t("alerts.max") : t("common.error"), "err");
   else showMsg("#alert-msg", t("alerts.saved"), "ok");
 });
+
+// ---------- More jobs from other sites (Careerjet) ----------
+async function loadOtherSites() {
+  if (!CONFIG.CAREERJET_ENABLED) return;
+  const type = $("#type").value;
+  const body = {
+    keywords: cleanSearch($("#q").value),
+    location: $("#pref").value || "",
+    work_hours: type === "full_time" ? "f" : (type === "part_time" || type === "arubaito") ? "p" : "",
+    page: page + 1,
+  };
+  try {
+    const res = await fetch(`${CONFIG.SUPABASE_URL}/functions/v1/careerjet-search`, {
+      method: "POST", headers: { "Content-Type": "application/json", apikey: CONFIG.SUPABASE_ANON_KEY }, body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    const jobs = (data.jobs || []).slice(0, 10);
+    $("#other-sites").classList.toggle("hidden", !jobs.length);
+    $("#other-list").replaceChildren(...jobs.map((j) => el("a", { class: "job-row", href: j.url, target: "_blank", rel: "noopener noreferrer nofollow sponsored" },
+      el("div", { class: "avatar", "aria-hidden": "true" }, "↗"),
+      el("div", {},
+        el("h3", {}, j.title),
+        el("div", { class: "company" }, j.company || ""),
+        el("div", { class: "where" }, j.locations || ""),
+        j.salary ? el("div", { class: "tags" }, el("span", { class: "tag pay" }, j.salary)) : null,
+        j.description ? el("p", { class: "hint" }, j.description) : null,
+      ),
+      el("div", { class: "when" }, j.date ? j.date.slice(0, 16) : ""),
+    )));
+  } catch (_) {
+    $("#other-sites").classList.add("hidden");
+  }
+}

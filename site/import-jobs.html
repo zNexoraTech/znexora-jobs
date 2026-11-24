@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Import jobs | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <a href="dashboard.html" data-i18n="common.back">Back</a>
+  <h1 data-i18n="imp.title">Import jobs</h1>
+  <div id="msg"></div>
+
+  <section class="card">
+    <h2 data-i18n="imp.csv_title">Upload a spreadsheet (CSV)</h2>
+    <p data-i18n="imp.csv_intro">Add many jobs at once. Upload the same file again later to update jobs with the same ref.</p>
+    <ol class="import-steps">
+      <li><a href="templates/jobs-template.csv" download data-i18n="imp.download_template">Download the template</a> <span class="hint" data-i18n="imp.template_hint">(open it in Excel or Google Sheets)</span></li>
+      <li data-i18n="imp.step_fill">Fill one row per job. Keep the first row (column names) as it is.</li>
+      <li data-i18n="imp.step_save">Save as CSV (UTF-8 or Excel's Japanese CSV both work), then choose the file below.</li>
+    </ol>
+    <details class="u-my12"><summary data-i18n="imp.columns_help">What goes in each column?</summary><div id="columns-help"></div></details>
+    <label for="csv" data-i18n="imp.choose_file">Choose CSV file</label>
+    <input type="file" id="csv" accept=".csv,text/csv">
+    <div id="preview"></div>
+    <div class="row u-my12"><button id="do-import" class="hidden" data-i18n="imp.import_btn">Import jobs</button></div>
+  </section>
+
+  <section class="card u-mt16" id="feeds-card">
+    <h2 data-i18n="imp.feeds_title">Import automatically from your careers page</h2>
+    <p data-i18n="imp.feeds_intro">If your careers page uses Google for Jobs markup (JobPosting), or you have an XML job feed, add its address. We check it every day: new jobs are added, changed jobs updated, and removed jobs closed.</p>
+    <div id="feeds-msg"></div>
+    <div id="feeds"></div>
+    <form id="feed-form" class="row u-my12">
+      <input type="url" id="feed-url" required placeholder="https://www.example.co.jp/careers" class="u-flex1">
+      <select id="feed-format" aria-label="Format"><option value="auto" data-i18n="imp.format_auto">Detect automatically</option><option value="jsonld">JobPosting (HTML)</option><option value="xml">XML feed</option></select>
+      <button type="submit" data-i18n="imp.add_feed">Add feed</button>
+    </form>
+    <p class="hint" data-i18n="imp.feeds_note">Only add pages you own or have permission to use. Verified companies only, up to 3 feeds.</p>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="assets/js/pages/import-jobs.js"></script>
+</body>
+</html>

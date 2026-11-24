@@ -31,8 +31,13 @@ supabase/
   migrations/002_...sql       ← visas, instant publishing, shared jobs, alerts
   functions/send-job-alerts/  ← daily email alerts (Resend)
   functions/share-job/        ← auto-post new jobs to Telegram / Facebook Page
+  migrations/003_job_import.sql ← CSV upload + job feeds
+  functions/import-feeds/     ← daily import from careers pages / XML feeds
+  functions/careerjet-search/ ← "More jobs from other sites"
+  functions/_shared/          ← feed parser + safe URL fetching
   seed.sql                    ← dummy data + make yourself admin (staging only)
 docs/
+  COLLECTING-JOBS.md      ← how to collect jobs (CSV, feeds, Careerjet, Hello Work)
   SECURITY-CHECKLIST.md
   LAUNCH-CHECKLIST.md
 ```
@@ -46,7 +51,7 @@ docs/
 ### 2. Create the Supabase project (staging)
 1. Go to supabase.com → New project → name `znexora-jobs-staging`, region **Tokyo (ap-northeast-1)**, strong DB password.
 2. **SQL Editor** → New query → paste all of `supabase/migrations/001_schema.sql` → **Run**. It should finish with "Success".
-3. Run `supabase/migrations/002_visas_autopublish_tips_alerts.sql` the same way (visas, instant publishing, shared jobs, alerts). See `docs/SOCIAL-AND-ALERTS.md` for the email-alert and Facebook/Telegram setup.
+3. Run `supabase/migrations/002_visas_autopublish_tips_alerts.sql` and then `003_job_import.sql` the same way (visas, instant publishing, shared jobs, alerts). See `docs/SOCIAL-AND-ALERTS.md` for the email-alert and Facebook/Telegram setup.
 4. **Authentication → Sign In / Providers → Email**: keep email sign-up on and **Confirm email ON**. Set minimum password length to 10.
 5. **Authentication → URL Configuration**:
    - Site URL: your Cloudflare address (step 3), e.g. `https://znexora-jobs.pages.dev`
@@ -109,6 +114,7 @@ cd site && python3 -m http.server 8788
 | Share a job seen on social media | – | ✅ | ✅ | ✅ |
 | Import external jobs | – | – | – | ✅ |
 | Email job alerts | – | ✅ (max 5) | – | – |
+| CSV upload / careers-page feed | – | – | ✅ (feeds: verified only) | ✅ |
 | Publish (make live) / reject jobs | – | – | – | ✅ |
 | See applicants + CVs | – | own only | own jobs only | ✅ |
 | Change own role / verify own company | – | ❌ | ❌ | ✅ |
