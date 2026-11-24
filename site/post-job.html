@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Post a job | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Myanmar:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <div class="card">
+    <h1 id="heading" data-i18n="post.title_new">Post a job</h1>
+    <p class="msg info" data-i18n="post.review_note">Every job is checked by our team before it goes live. Editing a live job sends it for review again.</p>
+    <div id="msg"></div>
+    <form id="job-form" class="grid grid-2">
+      <div class="u-full"><label for="title" data-i18n="post.job_title">Job title</label><input type="text" id="title" required minlength="3" maxlength="120"></div>
+      <div class="u-full"><label for="description" data-i18n="post.description">Job description</label><textarea id="description" required minlength="20" maxlength="8000" class="u-tall"></textarea></div>
+      <div><label for="prefecture" data-i18n="filter.prefecture">Prefecture</label><select id="prefecture" required></select></div>
+      <div><label for="city" data-i18n="post.city">City / area</label><input type="text" id="city" maxlength="80"></div>
+      <div><label for="job_type" data-i18n="filter.job_type">Job type</label><select id="job_type" required></select></div>
+      <div><label for="japanese" data-i18n="post.japanese_required">Japanese level required</label><select id="japanese"></select></div>
+      <div><label for="wage_type" data-i18n="post.wage_type">Pay period</label><select id="wage_type"></select></div>
+      <div class="row">
+        <div class="u-flex1"><label for="wage_min" data-i18n="post.wage_min">Pay from (¥)</label><input type="number" id="wage_min" min="0" step="1"></div>
+        <div class="u-flex1"><label for="wage_max" data-i18n="post.wage_max">Pay to (¥)</label><input type="number" id="wage_max" min="0" step="1"></div>
+      </div>
+      <div class="u-full"><label for="hours" data-i18n="post.hours">Working hours / days</label><input type="text" id="hours" maxlength="200"></div>
+      <div class="u-full"><label class="inline"><input type="checkbox" id="confirm" required> <span data-i18n="post.confirm">I confirm this job follows the posting rules, pays at least the minimum wage, and I will check every applicant's work permission.</span></label></div>
+      <div class="row"><button type="submit" data-i18n="post.submit">Submit for review</button><button type="button" id="draft" class="secondary" data-i18n="post.save_draft">Save as draft</button></div>
+    </form>
+  </div>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="/assets/js/pages/post-job.js"></script>
+</body>
+</html>

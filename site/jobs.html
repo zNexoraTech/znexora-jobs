@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Jobs | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Myanmar:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <h1 data-i18n="nav.jobs">Jobs</h1>
+  <form id="filters" class="card grid grid-3">
+    <div><label for="q" data-i18n="filter.keyword">Keyword</label><input type="text" id="q" name="q" maxlength="60"></div>
+    <div><label for="pref" data-i18n="filter.prefecture">Prefecture</label><select id="pref" name="pref"></select></div>
+    <div><label for="type" data-i18n="filter.job_type">Job type</label><select id="type" name="type"></select></div>
+    <div><label for="jp" data-i18n="filter.japanese">Japanese level required (max)</label><select id="jp" name="jp"></select></div>
+    <div class="u-end"><button type="submit" data-i18n="filter.apply">Search</button></div>
+  </form>
+  <p id="count" class="meta"></p>
+  <div id="results" class="grid"></div>
+  <div class="row u-mt16"><button id="prev" class="secondary" data-i18n="common.prev">Previous</button><button id="next" class="secondary" data-i18n="common.next">Next</button></div>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="/assets/js/pages/jobs.js"></script>
+</body>
+</html>

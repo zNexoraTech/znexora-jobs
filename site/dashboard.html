@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Dashboard | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Myanmar:wght@400;600;700&family=Noto+Sans+JP:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <h1 data-i18n="dash.title">My dashboard</h1>
+  <div id="msg"></div>
+
+  <!-- Job seeker -->
+  <section id="seeker" class="hidden grid">
+    <div class="card">
+      <h2 data-i18n="dash.seeker_profile">My profile</h2>
+      <div id="profile-msg"></div>
+      <form id="seeker-form" class="grid grid-2">
+        <div><label for="s-pref" data-i18n="dash.prefecture">Prefecture you live in</label><select id="s-pref"></select></div>
+        <div><label for="s-jp" data-i18n="dash.japanese_level">Japanese level</label><select id="s-jp"></select></div>
+        <div class="u-full"><label for="s-skills" data-i18n="dash.skills">Skills and experience</label><textarea id="s-skills" maxlength="2000"></textarea></div>
+        <div><label data-i18n="dash.job_types">Job types wanted</label><div id="s-types"></div></div>
+        <div><label for="s-visa" data-i18n="dash.visa_type">Visa type (optional)</label><input type="text" id="s-visa" maxlength="60"><p class="hint" data-i18n="dash.visa_hint">Only the type (e.g. Student, Engineer). Never enter card numbers.</p></div>
+        <div class="u-full"><label class="inline"><input type="checkbox" id="s-visible" checked> <span data-i18n="dash.visible">Allow employers I apply to see my profile</span></label></div>
+        <div><button type="submit" data-i18n="dash.save">Save</button></div>
+      </form>
+    </div>
+    <div class="card">
+      <h2 data-i18n="dash.my_apps">My applications</h2>
+      <div id="apps"></div>
+    </div>
+  </section>
+
+  <!-- Employer -->
+  <section id="employer" class="hidden grid">
+    <div class="card">
+      <div class="row"><h2 data-i18n="dash.company">Company profile</h2><span id="verified"></span></div>
+      <div id="company-msg"></div>
+      <form id="company-form" class="grid grid-2">
+        <div><label for="c-name" data-i18n="dash.company_name">Company name</label><input type="text" id="c-name" required maxlength="120"></div>
+        <div><label for="c-num" data-i18n="dash.corporate_number">Corporate number (13 digits)</label><input type="text" id="c-num" inputmode="numeric" pattern="[0-9]{13}" maxlength="13"></div>
+        <div><label for="c-addr" data-i18n="dash.address">Address</label><input type="text" id="c-addr" maxlength="200"></div>
+        <div><label for="c-phone" data-i18n="dash.phone">Phone</label><input type="tel" id="c-phone" maxlength="30"></div>
+        <div><label for="c-web" data-i18n="dash.website">Website</label><input type="url" id="c-web" maxlength="200"></div>
+        <div class="u-full"><label for="c-desc" data-i18n="dash.description">About the company</label><textarea id="c-desc" maxlength="3000"></textarea></div>
+        <div><button type="submit" data-i18n="dash.save">Save</button></div>
+      </form>
+    </div>
+    <div class="card">
+      <div class="row"><h2 data-i18n="dash.my_jobs">My jobs</h2><span class="spacer"></span><a id="post-btn" class="btn small" href="/post-job.html" data-i18n="nav.post_job">Post a job</a></div>
+      <div id="jobs"></div>
+    </div>
+  </section>
+
+  <!-- Admin -->
+  <section id="admin" class="hidden card">
+    <a class="btn" href="/admin.html" data-i18n="nav.admin">Admin</a>
+  </section>
+
+  <!-- Everyone -->
+  <section id="account" class="card hidden u-mt16">
+    <h2 data-i18n="dash.account">Account</h2>
+    <div id="account-msg"></div>
+    <button id="delete-account" class="danger" data-i18n="dash.delete_account">Delete my account</button>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="/assets/js/pages/dashboard.js"></script>
+</body>
+</html>
