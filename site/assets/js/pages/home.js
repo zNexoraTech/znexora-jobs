@@ -1,5 +1,5 @@
 import { BASE } from "../paths.js";
-import { initPage, $, el, fillPrefectureSelect } from "../ui.js";
+import { initPage, $, el, fillPrefectureSelect, CATEGORIES } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
 import { jobCard, emptyRow, initial, JOB_CARD_COLUMNS } from "../cards.js";
@@ -26,3 +26,10 @@ if (emps && emps.length) {
 } else {
   $("#employers-section").classList.add("hidden");
 }
+
+// Browse by industry (counts of live jobs per category)
+const { data: cats } = await sb.from("jobs").select("category").eq("status", "live").limit(5000);
+const counts = {};
+for (const r of cats || []) counts[r.category] = (counts[r.category] || 0) + 1;
+$("#cat-grid").replaceChildren(...CATEGORIES.map((c) => el("a", { href: `${BASE}jobs.html?cat=${c}` },
+  el("span", {}, t(`cat.${c}`)), el("span", { class: "count" }, String(counts[c] || 0)))));

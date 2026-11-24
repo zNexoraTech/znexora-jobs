@@ -64,6 +64,7 @@ async function loadAlerts() {
       a.job_type && t(`jobtype.${a.job_type}`),
       a.jp_max && `${t("job.japanese")}: ${t(`jp.${a.jp_max}`)}`,
       a.visa && t(`visa.${a.visa}`),
+      a.category && t(`cat.${a.category}`),
     ].filter(Boolean);
     return el("div", { class: "alert-row" },
       el("div", { class: "tags" }, ...(parts.length ? parts : [t("alerts.all_jobs")]).map((x) => el("span", { class: "tag" }, x))),

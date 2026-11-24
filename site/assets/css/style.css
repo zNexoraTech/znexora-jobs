@@ -266,3 +266,16 @@ html[lang="my"] .hero h1 { font-size: clamp(1.6rem, 3.4vw, 2.4rem); max-width: 2
 .table-scroll { overflow-x: auto; margin-top: 12px; }
 .table-scroll td .badge { white-space: normal; }
 #columns-help td { font-size: .9rem; }
+
+/* ---------- Categories + multi-job form ---------- */
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.cat-grid a { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px 14px; background: var(--white);
+  border: 1px solid var(--line); border-radius: var(--r-sm); text-decoration: none; color: var(--ink); font-weight: 500; }
+.cat-grid a:hover { border-color: var(--blue-400); color: var(--blue-700); }
+.cat-grid .count { color: var(--ink-2); font-weight: 400; font-size: .85rem; }
+.job-card-form { border: 1px solid var(--line); border-left: 4px solid var(--blue-600); border-radius: 0; padding: 16px 18px; margin: 14px 0; background: var(--white); }
+.job-card-form .head { display: flex; align-items: center; gap: 8px; }
+.job-card-form .head h3 { margin: 0; font-size: 1.05rem; }
+.job-card-form .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0 14px; }
+.job-card-form .wide { grid-column: 1 / -1; }
+.job-card-form .card-msg:empty { display: none; }

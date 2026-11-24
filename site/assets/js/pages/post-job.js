@@ -1,5 +1,5 @@
 import { p } from "../paths.js";
-import { initPage, $, showMsg, requireRole, qs, isUuid, fillPrefectureSelect, fillOptions, visaCheckboxes, JOB_TYPES, JP_LEVELS, WAGE_TYPES, SSW_FIELDS } from "../ui.js";
+import { initPage, $, showMsg, requireRole, qs, isUuid, fillPrefectureSelect, fillOptions, fillCategorySelect, visaCheckboxes, JOB_TYPES, JP_LEVELS, WAGE_TYPES, SSW_FIELDS } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
 
@@ -7,6 +7,7 @@ const profile = await initPage();
 if (!requireRole(profile, ["employer"])) throw new Error("auth");
 
 fillPrefectureSelect($("#prefecture"));
+fillCategorySelect($("#category"));
 fillOptions($("#job_type"), JOB_TYPES, "jobtype");
 fillOptions($("#japanese"), JP_LEVELS, "jp");
 fillOptions($("#wage_type"), WAGE_TYPES, "wage");
@@ -26,7 +27,7 @@ if (editId) {
   const { data: job } = await sb.from("jobs").select("*").eq("id", editId).maybeSingle();
   if (!job) { showMsg("#msg", t("job.not_found"), "err"); throw new Error("not found"); }
   $("#heading").textContent = t("post.title_edit");
-  for (const k of ["title", "description", "prefecture", "city", "job_type", "wage_type", "wage_min", "wage_max", "hours"]) $(`#${k}`).value = job[k] ?? "";
+  for (const k of ["title", "description", "prefecture", "city", "job_type", "wage_type", "wage_min", "wage_max", "hours", "category"]) $(`#${k}`).value = job[k] ?? "";
   $("#japanese").value = job.japanese_level_required || "none";
   $("#visas").replaceChildren();
   readVisas = visaCheckboxes($("#visas"), job.eligible_visas || []);
@@ -48,6 +49,7 @@ async function save(status) {
     wage_min: num($("#wage_min").value),
     wage_max: num($("#wage_max").value),
     hours: $("#hours").value.trim() || null,
+    category: $("#category").value || null,
     eligible_visas: readVisas(),
     ssw_field: readVisas().some((v) => v === "ssw1" || v === "ssw2") ? $("#ssw_field").value : null,
     status,

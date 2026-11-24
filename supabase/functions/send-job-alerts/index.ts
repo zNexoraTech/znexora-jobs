@@ -45,6 +45,7 @@ Deno.serve(async (req) => {
       if (a.job_type) q = q.eq("job_type", a.job_type);
       if (a.jp_max) q = q.in("japanese_level_required", JP_ORDER.slice(0, JP_ORDER.indexOf(a.jp_max) + 1));
       if (a.visa) q = q.contains("eligible_visas", [a.visa]);
+      if (a.category) q = q.eq("category", a.category);
       if (a.keyword) {
         const k = a.keyword.replace(/[,()*%\\:."']/g, " ").trim();
         if (k) q = q.or(`title.ilike.*${k}*,description.ilike.*${k}*`);

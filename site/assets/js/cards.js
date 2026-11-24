@@ -4,7 +4,7 @@ import { t } from "./i18n.js";
 
 /** Columns needed for a job row (employer columns limited to what visitors may read) */
 export const JOB_CARD_COLUMNS =
-  "id, title, prefecture, city, job_type, wage_type, wage_min, wage_max, japanese_level_required, created_at, employers(company_name)";
+  "id, title, category, prefecture, city, job_type, wage_type, wage_min, wage_max, japanese_level_required, created_at, employers(company_name)";
 
 /** First visible letter of a company name, for the avatar */
 export function initial(name) {
@@ -25,6 +25,7 @@ export function jobCard(job) {
       el("div", { class: "where" }, where),
       el("div", { class: "tags" },
         el("span", { class: "tag pay" }, formatWage(job)),
+        job.category ? el("span", { class: "tag" }, t(`cat.${job.category}`)) : null,
         el("span", { class: "tag" }, t(`jobtype.${job.job_type}`)),
         job.japanese_level_required ? el("span", { class: "tag" }, `${t("job.japanese")}: ${t(`jp.${job.japanese_level_required}`)}`) : null,
       ),

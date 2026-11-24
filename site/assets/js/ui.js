@@ -229,3 +229,13 @@ export function visaCheckboxes(container, selected = []) {
   }
   return () => [...container.querySelectorAll("input[name=visa]:checked")].map((c) => c.value);
 }
+
+// ---------- Industry categories (sorted automatically when left empty) ----------
+export const CATEGORIES = ["restaurant", "care", "factory", "construction", "logistics", "retail", "hotel", "cleaning",
+  "agriculture", "it", "office", "education", "other"];
+
+/** <select> of categories; first option = "detect automatically" (empty) unless anyLabel given */
+export function fillCategorySelect(select, { any = false } = {}) {
+  select.append(el("option", { value: "" }, any ? t("filter.any") : t("cat.auto")));
+  for (const c of CATEGORIES) select.append(el("option", { value: c }, t(`cat.${c}`)));
+}

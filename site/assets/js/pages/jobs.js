@@ -1,4 +1,4 @@
-import { initPage, $, el, qs, isUuid, cleanSearch, showMsg, fillPrefectureSelect, fillOptions, JOB_TYPES, JP_LEVELS, VISAS } from "../ui.js";
+import { initPage, $, el, qs, isUuid, cleanSearch, showMsg, fillPrefectureSelect, fillOptions, fillCategorySelect, JOB_TYPES, JP_LEVELS, VISAS, CATEGORIES } from "../ui.js";
 import { p as path } from "../paths.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
@@ -11,6 +11,7 @@ fillPrefectureSelect($("#pref"), { withAny: true });
 fillOptions($("#type"), JOB_TYPES, "jobtype", { withAny: true });
 fillOptions($("#jp"), JP_LEVELS, "jp", { withAny: true });
 fillOptions($("#visa"), VISAS, "visa", { withAny: true });
+fillCategorySelect($("#cat"), { any: true });
 
 // restore filters from URL
 $("#q").value = qs("q") || "";
@@ -18,6 +19,7 @@ $("#pref").value = qs("pref") || "";
 $("#type").value = qs("type") || "";
 $("#jp").value = qs("jp") || "";
 $("#visa").value = VISAS.includes(qs("visa")) ? qs("visa") : "";
+$("#cat").value = CATEGORIES.includes(qs("cat")) ? qs("cat") : "";
 const emp = isUuid(qs("emp")) ? qs("emp") : null;
 let page = Math.max(0, parseInt(qs("page") || "0", 10) || 0);
 
@@ -34,6 +36,9 @@ async function load() {
   if (emp) query = query.eq("employer_id", emp);
   if ($("#pref").value) query = query.eq("prefecture", $("#pref").value);
   if (JOB_TYPES.includes($("#type").value)) query = query.eq("job_type", $("#type").value);
+  const cat = $("#cat").value;
+  if (CATEGORIES.includes(cat)) query = query.eq("category", cat);
+  $("#jobs-h").textContent = CATEGORIES.includes(cat) ? t("cat.jobs_in", { cat: t(`cat.${cat}`) }) : t("nav.jobs");
   if (VISAS.includes($("#visa").value)) query = query.contains("eligible_visas", [$("#visa").value]);
   const jp = $("#jp").value;
   if (JP_LEVELS.includes(jp)) {
@@ -53,7 +58,7 @@ async function load() {
 
 function pushState() {
   const p = new URLSearchParams();
-  for (const k of ["q", "pref", "type", "jp", "visa"]) if ($(`#${k}`).value) p.set(k, $(`#${k}`).value);
+  for (const k of ["q", "cat", "pref", "type", "jp", "visa"]) if ($(`#${k}`).value) p.set(k, $(`#${k}`).value);
   if (emp) p.set("emp", emp);
   if (page) p.set("page", page);
   history.replaceState(null, "", `?${p}`);
@@ -74,6 +79,7 @@ $("#save-alert").addEventListener("click", async () => {
     job_type: JOB_TYPES.includes($("#type").value) ? $("#type").value : null,
     jp_max: JP_LEVELS.includes($("#jp").value) ? $("#jp").value : null,
     visa: VISAS.includes($("#visa").value) ? $("#visa").value : null,
+    category: CATEGORIES.includes($("#cat").value) ? $("#cat").value : null,
   };
   const { error } = await sb.from("job_alerts").insert(row);
   if (error) showMsg("#alert-msg", /maximum/.test(error.message) ? t("alerts.max") : t("common.error"), "err");

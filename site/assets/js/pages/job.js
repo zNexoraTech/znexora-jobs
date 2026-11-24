@@ -9,7 +9,7 @@ const id = qs("id");
 if (!isUuid(id)) { showMsg("#msg", t("job.not_found"), "err"); throw new Error("bad id"); }
 
 const { data: job, error } = await sb.from("jobs")
-  .select("id, title, description, prefecture, city, job_type, wage_type, wage_min, wage_max, hours, japanese_level_required, eligible_visas, ssw_field, external, apply_contact, source_url, status, created_at, employer_id, employers(company_name, website, description)")
+  .select("id, title, description, prefecture, city, job_type, wage_type, wage_min, wage_max, hours, japanese_level_required, category, eligible_visas, ssw_field, external, apply_contact, source_url, status, created_at, employer_id, employers(company_name, website, description)")
   .eq("id", id).maybeSingle();
 
 if (error || !job) { showMsg("#msg", t("job.not_found"), "err"); throw new Error("not found"); }
@@ -24,6 +24,7 @@ art.replaceChildren(...[
   job.status !== "live" ? el("p", {}, el("span", { class: `badge ${job.status}` }, t(`status.${job.status}`))) : null,
   el("dl", { class: "facts" },
     ...fact(t("job.location"), [prefectureName(job.prefecture), job.city].filter(Boolean).join(" · ")),
+    ...fact(t("cat.label"), job.category ? t(`cat.${job.category}`) : ""),
     ...fact(t("filter.job_type"), t(`jobtype.${job.job_type}`)),
     ...fact(t("job.wage"), formatWage(job)),
     ...fact(t("job.hours"), job.hours),

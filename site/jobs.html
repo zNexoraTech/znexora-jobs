@@ -15,9 +15,10 @@
 <body>
 <header id="site-header" class="site-header"></header>
 <main class="wrap">
-  <h1 data-i18n="nav.jobs">Jobs</h1>
+  <h1 id="jobs-h" data-i18n="nav.jobs">Jobs</h1>
   <form id="filters" class="filters">
     <div><label for="q" data-i18n="filter.keyword">Keyword</label><input type="text" id="q" name="q" maxlength="60"></div>
+    <div><label for="cat" data-i18n="cat.label">Industry</label><select id="cat" name="cat"></select></div>
     <div><label for="pref" data-i18n="filter.prefecture">Prefecture</label><select id="pref" name="pref"></select></div>
     <div><label for="type" data-i18n="filter.job_type">Job type</label><select id="type" name="type"></select></div>
     <div><label for="visa" data-i18n="filter.visa">My visa type</label><select id="visa" name="visa"></select></div>

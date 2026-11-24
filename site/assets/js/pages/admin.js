@@ -1,6 +1,7 @@
 import { BASE } from "../paths.js";
-import { initPage, $, el, showMsg, requireRole, badge, formatDate, formatWage, prefectureName, safeUrl, fillPrefectureSelect, fillOptions, visaCheckboxes, JOB_TYPES, JP_LEVELS, WAGE_TYPES, SSW_FIELDS } from "../ui.js";
+import { initPage, $, el, showMsg, requireRole, badge, formatDate, formatWage, prefectureName, safeUrl, fillPrefectureSelect, fillOptions, fillCategorySelect, visaCheckboxes, JOB_TYPES, JP_LEVELS, WAGE_TYPES, SSW_FIELDS } from "../ui.js";
 import { sb } from "../supabase.js";
+import { buildXlsx, downloadBlob } from "../xlsx.js";
 import { t } from "../i18n.js";
 
 const profile = await initPage();
@@ -22,6 +23,7 @@ async function load(tab) {
   if (tab === "tips") return tips();
   if (tab === "import") return importForm();
   if (tab === "trusted") return trusted();
+  if (tab === "excel") return excel();
 }
 
 const empty = () => panel.replaceChildren(el("p", { class: "meta" }, t("admin.empty")));
@@ -158,6 +160,7 @@ async function importForm(tip = null) {
   const pref = sel("imp-pref", (s) => fillPrefectureSelect(s));
   pref.value = tip?.prefecture || "Tokyo";
   const type = sel("imp-type", (s) => fillOptions(s, JOB_TYPES, "jobtype"));
+  const cat = sel("imp-cat", (s) => fillCategorySelect(s));
   const jp = sel("imp-jp", (s) => fillOptions(s, JP_LEVELS, "jp"));
   const wageType = sel("imp-wt", (s) => fillOptions(s, WAGE_TYPES, "wage"));
   const wmin = el("input", { type: "number", id: "imp-wmin", min: 0 });
@@ -176,6 +179,7 @@ async function importForm(tip = null) {
     el("div", { class: "u-full" }, el("label", { for: "imp-title" }, t("post.job_title")), title),
     el("div", { class: "u-full" }, el("label", { for: "imp-desc" }, t("post.description")), desc),
     f("imp-pref", t("filter.prefecture"), pref),
+    f("imp-cat", t("cat.label"), cat),
     f("imp-type", t("filter.job_type"), type),
     f("imp-jp", t("post.japanese_required"), jp),
     f("imp-wt", t("post.wage_type"), wageType),
@@ -202,7 +206,7 @@ async function importForm(tip = null) {
     const visas = readVisas();
     const { error } = await sb.from("jobs").insert({
       employer_id: employerId, title: title.value.trim(), description: desc.value.trim(),
-      prefecture: pref.value, job_type: type.value, japanese_level_required: jp.value,
+      prefecture: pref.value, job_type: type.value, category: cat.value || null, japanese_level_required: jp.value,
       wage_type: wageType.value, wage_min: num(wmin.value), wage_max: num(wmax.value),
       eligible_visas: visas, ssw_field: visas.some((v) => v.startsWith("ssw")) && ssw.value ? ssw.value : null,
       external: true, apply_contact: contact.value.trim(), source_url: safeUrl(source.value.trim()) || null, status: "live",
@@ -230,6 +234,63 @@ async function trusted() {
       trusted();
     } }, t(e.auto_publish ? "admin.turn_off" : "admin.turn_on")),
   )));
+}
+
+// ---------- Excel export (always up to date: built from the live database when clicked) ----------
+async function fetchAll(table, columns, order = "created_at") {
+  const out = [];
+  for (let from = 0; from < 50000; from += 1000) {
+    const { data, error } = await sb.from(table).select(columns).order(order, { ascending: false }).range(from, from + 999);
+    if (error) throw error;
+    out.push(...data);
+    if (data.length < 1000) break;
+  }
+  return out;
+}
+
+function excel() {
+  const status = el("p", { class: "meta" });
+  const btn = el("button", { onclick: async () => {
+    btn.disabled = true; status.textContent = t("xl.building");
+    try {
+      const [jobs, emps, tips] = await Promise.all([
+        fetchAll("jobs", "id, title, category, status, prefecture, city, job_type, wage_type, wage_min, wage_max, hours, japanese_level_required, eligible_visas, ssw_field, external, apply_contact, source_url, created_at, updated_at, expires_at, employers(company_name), applications(count)"),
+        fetchAll("employers", "id, company_name, verified, auto_publish, corporate_number, address, phone, website, owner_id, created_at, jobs(count)"),
+        fetchAll("job_tips", "platform, company_name, prefecture, details, contact, source_url, status, created_at"),
+      ]);
+      const d = (s) => (s ? new Date(s) : null);
+      const blob = buildXlsx([
+        { name: "Jobs", columns: [
+            { header: "Job ID", width: 38 }, { header: "Title", width: 36 }, { header: "Company", width: 26 }, { header: "Industry", width: 16 },
+            { header: "Status", width: 10 }, { header: "Prefecture", width: 12 }, { header: "City", width: 14 }, { header: "Job type", width: 12 },
+            { header: "Pay period", width: 10 }, { header: "Pay min (¥)", width: 12 }, { header: "Pay max (¥)", width: 12 }, { header: "Hours", width: 24 },
+            { header: "Japanese", width: 10 }, { header: "Visa types", width: 34 }, { header: "SSW field", width: 16 }, { header: "Imported", width: 9 },
+            { header: "How to apply (imported)", width: 26 }, { header: "Source", width: 30 }, { header: "Applications", width: 12 },
+            { header: "Posted", width: 17 }, { header: "Updated", width: 17 }, { header: "Expires", width: 17 }, { header: "Job page", width: 50 }],
+          rows: jobs.map((j) => [j.id, j.title, j.employers?.company_name, j.category, j.status, j.prefecture, j.city, j.job_type,
+            j.wage_type, j.wage_min, j.wage_max, j.hours, j.japanese_level_required, (j.eligible_visas || []).join(", "), j.ssw_field,
+            j.external ? "yes" : "", j.apply_contact, j.source_url, j.applications?.[0]?.count ?? 0,
+            d(j.created_at), d(j.updated_at), d(j.expires_at), `${location.origin}${BASE}job.html?id=${j.id}`]) },
+        { name: "Employers", columns: [
+            { header: "Company", width: 30 }, { header: "Verified", width: 9 }, { header: "Instant publishing", width: 10 },
+            { header: "Corporate number", width: 16 }, { header: "Address", width: 30 }, { header: "Phone", width: 14 }, { header: "Website", width: 30 },
+            { header: "Type", width: 12 }, { header: "Jobs", width: 8 }, { header: "Registered", width: 17 }],
+          rows: emps.map((e) => [e.company_name, e.verified ? "yes" : "no", e.auto_publish ? "yes" : "no", e.corporate_number, e.address,
+            e.phone, e.website, e.owner_id ? "account" : "imported listing", e.jobs?.[0]?.count ?? 0, d(e.created_at)]) },
+        { name: "Shared jobs", columns: [
+            { header: "Platform", width: 10 }, { header: "Company", width: 24 }, { header: "Prefecture", width: 12 }, { header: "Details", width: 60 },
+            { header: "Contact", width: 24 }, { header: "Link", width: 36 }, { header: "Status", width: 10 }, { header: "Sent", width: 17 }],
+          rows: tips.map((x) => [x.platform, x.company_name, x.prefecture, x.details, x.contact, x.source_url, x.status, d(x.created_at)]) },
+      ]);
+      const now = new Date();
+      downloadBlob(blob, `znexora-jobs-${now.toISOString().slice(0, 10)}.xlsx`);
+      status.textContent = t("xl.done", { jobs: jobs.length, emps: emps.length });
+    } catch (_) {
+      status.textContent = t("common.error");
+    }
+    btn.disabled = false;
+  } }, t("xl.download"));
+  panel.replaceChildren(el("div", { class: "card" }, el("h2", {}, t("xl.title")), el("p", {}, t("xl.intro")), btn, status));
 }
 
 load("employers");

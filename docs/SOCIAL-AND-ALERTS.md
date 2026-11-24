@@ -60,6 +60,13 @@ supabase secrets set WEBHOOK_SECRET="another-long-random-string" \
   TELEGRAM_BOT_TOKEN=123:abc TELEGRAM_CHAT_ID=@your_channel \
   FB_PAGE_ID=1234567890 FB_PAGE_TOKEN=EAAB...
 ```
+**Per-industry channels (optional).** Every job goes to the main channel/Page above, *and* to its industry's channel/Page if you set one:
+```bash
+supabase secrets set TELEGRAM_CHANNELS='{"restaurant":"@zjobs_food","care":"@zjobs_care","factory":"@zjobs_factory"}'
+supabase secrets set FB_PAGES='{"care":{"id":"1234567890","token":"EAAB..."}}'
+```
+Industries: restaurant, care, factory, construction, logistics, retail, hotel, cleaning, agriculture, it, office, education, other.
+
 Supabase → Database → **Webhooks** → Create:
 - Table `jobs`, events **Insert** and **Update**
 - Type: **Supabase Edge Functions** → `share-job`, method POST

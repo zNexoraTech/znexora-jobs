@@ -5,7 +5,7 @@ There are five ways jobs get onto the site. 1 to 3 work as soon as Supabase is s
 | # | Source | Who uses it | Needs |
 |---|---|---|---|
 | 1 | Post a job (form) | Employers | Nothing extra |
-| 2 | CSV upload (many jobs at once) | Employers, recruiters, staffing companies | Migration 003 |
+| 2 | Multi-job form ("Add jobs", up to 20 at once) | Employers, recruiters, staffing companies | Migrations 003 + 004 |
 | 3 | Shared jobs + admin import | Job seekers send, you publish | Migration 002 (done) |
 | 4 | Careers page / XML feed, imported daily | Verified employers | Migration 003 + `import-feeds` function |
 | 5 | More jobs from other sites (Careerjet) | Shown on the jobs page | Careerjet partner account + `careerjet-search` function |
@@ -13,15 +13,17 @@ There are five ways jobs get onto the site. 1 to 3 work as soon as Supabase is s
 
 ---
 
-## Step 1. Run migration 003 (2 min)
-Supabase → SQL Editor → New query → paste `supabase/migrations/003_job_import.sql` → Run.
+## Step 1. Run migrations 003 and 004 (2 min)
+Supabase → SQL Editor → run `003_job_import.sql`, then `004_categories.sql`.
 
-That's all CSV upload needs. Employers see **Import jobs** in their dashboard:
-1. Download the template (`site/templates/jobs-template.csv`)
-2. Fill one row per job in Excel / Google Sheets
-3. Upload. They get a preview showing which rows are OK and what's wrong with the others, then import.
+Employers then see **Add jobs** in their dashboard: a form with one card per job (up to 20). **Copy** duplicates a card (keeping everything except the title) so similar jobs take seconds.
 
-Rows with the same `ref` update the existing job, so recruiters can re-upload their whole list every week. Up to 200 rows per file. UTF-8 and Excel's Japanese CSV (Shift_JIS) both work.
+### What the robot does with every job (form, single post, feed or admin import)
+1. **Sorts it into an industry**: restaurant, care, factory, construction, logistics, retail, hotel, cleaning, agriculture, IT, office, education, other. It uses the employer's choice, or detects it from the title/description in English, Japanese and Burmese when left on "Detect automatically".
+2. **Shows it on the matching category page** (`jobs.html?cat=restaurant` …) and in the "Browse by industry" grid on the home page.
+3. **Posts it to the matching social channels**: your main Telegram channel/Facebook Page, plus the industry channel/Page if you set one (see `docs/SOCIAL-AND-ALERTS.md`, `TELEGRAM_CHANNELS` / `FB_PAGES`).
+4. **Emails matching job seekers** in the next daily alert. Alerts can now include an industry.
+5. **Keeps the Excel up to date**: Admin → **Excel** → *Download Excel* builds a fresh .xlsx from the live database (sheets: Jobs, Employers, Shared jobs) every time you click.
 
 ## Step 2. Daily import from careers pages and XML feeds (15 min)
 
@@ -84,10 +86,11 @@ When approved, send me the data specification they give you and I'll add a Hello
 - Don't leave stale jobs online. Feeds close missing jobs automatically, and jobs expire after 60 days.
 
 ## Preparation checklist
-- [ ] Supabase set up and migrations 001, 002, 003 run
+- [ ] Supabase set up and migrations 001, 002, 003, 004 run
 - [ ] Supabase CLI installed and project linked
 - [ ] `CRON_SECRET` chosen; `pg_cron` + `pg_net` enabled
 - [ ] `import-feeds` deployed and scheduled
-- [ ] A short "How to send us your jobs" message for recruiters (CSV template + feed option)
+- [ ] A short "How to send us your jobs" message for recruiters (register, then Add jobs, or give us your careers-page address)
+- [ ] (Optional) Telegram channels / Facebook Pages per industry
 - [ ] Careerjet publisher account and API key
 - [ ] (Later) MHLW notification number, then Hello Work data service application
