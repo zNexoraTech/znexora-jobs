@@ -239,3 +239,23 @@ html[lang="my"] .hero h1 { font-size: clamp(1.6rem, 3.4vw, 2.4rem); max-width: 2
   .facts dd { margin-bottom: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+/* ---------- Visa UI ---------- */
+.visa-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2px 16px; }
+.visa-option { align-items: flex-start; margin: 4px 0; line-height: 1.4; }
+.visa-option input { margin-top: 3px; }
+.who-can-apply { background: var(--blue-50); border-radius: var(--r-md); padding: 16px 18px; margin: 16px 0; }
+.who-can-apply h2 { font-size: 1.05rem; margin: 0 0 8px; }
+.who-can-apply ul { margin: 0 0 8px; padding-left: 20px; }
+.who-can-apply .hint { margin: 0; }
+.contact-box { border: 2px solid var(--padauk); background: var(--padauk-100); border-radius: var(--r-md); padding: 16px 18px; }
+.contact-box strong { display: block; font-size: 1.1rem; margin: 4px 0 8px; word-break: break-word; }
+.visa-card { padding: 18px 0; border-top: 1px solid var(--line); }
+.visa-card h2 { font-size: 1.1rem; margin: 0 0 4px; }
+.visa-card .jp { color: var(--ink-2); font-size: .9rem; margin: 0 0 6px; }
+.visa-card p { margin: 0; max-width: 75ch; }
+.visa-card.no-work h2 { color: var(--bad); }
+.note-box { border-left: 4px solid var(--padauk); background: var(--padauk-100); padding: 14px 16px; margin: 16px 0; border-radius: 0; }
+.alert-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line); }
+.alert-row:first-child { border-top: 0; }
+.alert-actions { margin: 4px 0 16px; }

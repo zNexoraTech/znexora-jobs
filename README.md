@@ -28,6 +28,9 @@ site/                     ← the website (Cloudflare Pages output directory)
 supabase/
   migrations/001_schema.sql   ← tables, RLS policies, triggers, storage bucket
   functions/delete-account/   ← Edge Function for "Delete my account"
+  migrations/002_...sql       ← visas, instant publishing, shared jobs, alerts
+  functions/send-job-alerts/  ← daily email alerts (Resend)
+  functions/share-job/        ← auto-post new jobs to Telegram / Facebook Page
   seed.sql                    ← dummy data + make yourself admin (staging only)
 docs/
   SECURITY-CHECKLIST.md
@@ -43,11 +46,12 @@ docs/
 ### 2. Create the Supabase project (staging)
 1. Go to supabase.com → New project → name `znexora-jobs-staging`, region **Tokyo (ap-northeast-1)**, strong DB password.
 2. **SQL Editor** → New query → paste all of `supabase/migrations/001_schema.sql` → **Run**. It should finish with "Success".
-3. **Authentication → Sign In / Providers → Email**: keep email sign-up on and **Confirm email ON**. Set minimum password length to 10.
-4. **Authentication → URL Configuration**:
+3. Run `supabase/migrations/002_visas_autopublish_tips_alerts.sql` the same way (visas, instant publishing, shared jobs, alerts). See `docs/SOCIAL-AND-ALERTS.md` for the email-alert and Facebook/Telegram setup.
+4. **Authentication → Sign In / Providers → Email**: keep email sign-up on and **Confirm email ON**. Set minimum password length to 10.
+5. **Authentication → URL Configuration**:
    - Site URL: your Cloudflare address (step 3), e.g. `https://znexora-jobs.pages.dev`
    - Redirect URLs: add `https://znexora-jobs.pages.dev/**` and `http://localhost:8788/**`
-5. **Project Settings → API**: copy the **Project URL** and the **anon public** key.
+6. **Project Settings → API**: copy the **Project URL** and the **anon public** key.
    ⚠️ Never copy the `service_role` key into the website.
 
 ### 3. Edit the config
@@ -57,8 +61,8 @@ Open `site/assets/js/config.js` and paste the Project URL and anon key. Commit t
 
 **A. GitHub Pages — quickest for testing**
 1. GitHub Pages is free only for **public** repos (private needs GitHub Pro). A public repo is OK for testing: the anon key is meant to be public and the database rules protect the data. Just never commit the `service_role` key.
-2. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Push to `main` (or Actions tab → "Deploy site to GitHub Pages" → Run workflow). The included `.github/workflows/pages.yml` publishes the `site/` folder.
+2. Push to `main` (or Actions tab → "Deploy site to GitHub Pages" → Run workflow). The included `.github/workflows/pages.yml` copies the `site/` folder to a `gh-pages` branch.
+3. Repo **Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: `gh-pages`, folder `/ (root)`** → Save.
 4. Open `https://YOUR-USERNAME.github.io/REPO-NAME/` (shown in Settings → Pages after the first run).
 5. In Supabase → Authentication → URL Configuration: set Site URL to that address, and add `https://YOUR-USERNAME.github.io/REPO-NAME/**` to Redirect URLs.
 6. Note: GitHub Pages ignores `_headers`; each page has a Content-Security-Policy meta tag instead. GitHub's terms don't allow running a commercial service on GitHub Pages, so **move to Cloudflare Pages (B) before public launch**.
@@ -101,7 +105,10 @@ cd site && python3 -m http.server 8788
 | See live jobs | ✅ | ✅ | ✅ | ✅ |
 | Apply / upload CV | – | ✅ (live jobs only) | – | – |
 | Create company profile | – | – | ✅ (unverified) | ✅ |
-| Post jobs | – | – | ✅ → goes to review | ✅ |
+| Post jobs | – | – | ✅ first job reviewed, then instant (risky words always reviewed) | ✅ |
+| Share a job seen on social media | – | ✅ | ✅ | ✅ |
+| Import external jobs | – | – | – | ✅ |
+| Email job alerts | – | ✅ (max 5) | – | – |
 | Publish (make live) / reject jobs | – | – | – | ✅ |
 | See applicants + CVs | – | own only | own jobs only | ✅ |
 | Change own role / verify own company | – | ❌ | ❌ | ✅ |

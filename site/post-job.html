@@ -17,7 +17,7 @@
 <main class="wrap">
   <div class="card">
     <h1 id="heading" data-i18n="post.title_new">Post a job</h1>
-    <p class="msg info" data-i18n="post.review_note">Every job is checked by our team before it goes live. Editing a live job sends it for review again.</p>
+    <p id="review-note" class="msg info" data-i18n="post.review_note">Your first job is checked by our team before it goes live. After that, verified employers publish instantly.</p>
     <div id="msg"></div>
     <form id="job-form" class="grid grid-2">
       <div class="u-full"><label for="title" data-i18n="post.job_title">Job title</label><input type="text" id="title" required minlength="3" maxlength="120"></div>
@@ -32,6 +32,17 @@
         <div class="u-flex1"><label for="wage_max" data-i18n="post.wage_max">Pay to (¥)</label><input type="number" id="wage_max" min="0" step="1"></div>
       </div>
       <div class="u-full"><label for="hours" data-i18n="post.hours">Working hours / days</label><input type="text" id="hours" maxlength="200"></div>
+      <fieldset class="u-full card">
+        <legend><strong data-i18n="post.visas">Which visa types can do this job?</strong></legend>
+        <p class="hint" data-i18n="post.visas_hint">Tick every status of residence that legally allows this work. Job seekers can filter by visa. Not sure? See the visa guide.</p>
+        <div id="visas" class="visa-grid"></div>
+        <div id="ssw-row" class="hidden">
+          <label for="ssw_field" data-i18n="post.ssw_field">Specified Skilled Worker field</label>
+          <select id="ssw_field"></select>
+          <p class="hint" data-i18n="post.ssw_hint">Specified Skilled Workers can only work in the field they passed the test for.</p>
+        </div>
+        <p><a href="legal/visa-guide.html" target="_blank" rel="noopener" data-i18n="nav.visa_guide">Visa guide</a></p>
+      </fieldset>
       <div class="u-full"><label class="inline"><input type="checkbox" id="confirm" required> <span data-i18n="post.confirm">I confirm this job follows the posting rules, pays at least the minimum wage, and I will check every applicant's work permission.</span></label></div>
       <div class="row"><button type="submit" data-i18n="post.submit">Submit for review</button><button type="button" id="draft" class="secondary" data-i18n="post.save_draft">Save as draft</button></div>
     </form>

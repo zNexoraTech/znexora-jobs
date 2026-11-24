@@ -1,5 +1,6 @@
 import { BASE } from "../paths.js";
 import { initPage, $, el, qs, isUuid, showMsg, formatWage, formatDate, prefectureName, safeUrl, fillOptions, REPORT_REASONS } from "../ui.js";
+import { p } from "../paths.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
 
@@ -8,7 +9,7 @@ const id = qs("id");
 if (!isUuid(id)) { showMsg("#msg", t("job.not_found"), "err"); throw new Error("bad id"); }
 
 const { data: job, error } = await sb.from("jobs")
-  .select("id, title, description, prefecture, city, job_type, wage_type, wage_min, wage_max, hours, japanese_level_required, status, created_at, employer_id, employers(company_name, website, description)")
+  .select("id, title, description, prefecture, city, job_type, wage_type, wage_min, wage_max, hours, japanese_level_required, eligible_visas, ssw_field, external, apply_contact, source_url, status, created_at, employer_id, employers(company_name, website, description)")
   .eq("id", id).maybeSingle();
 
 if (error || !job) { showMsg("#msg", t("job.not_found"), "err"); throw new Error("not found"); }
@@ -29,15 +30,37 @@ art.replaceChildren(...[
     ...fact(t("job.japanese"), job.japanese_level_required ? t(`jp.${job.japanese_level_required}`) : ""),
     ...fact(t("job.posted"), formatDate(job.created_at)),
   ),
+  whoCanApply(job),
   el("div", { class: "description" }, job.description),
   job.employers?.description ? el("div", {}, el("h3", {}, t("job.company")), el("p", { class: "description" }, job.employers.description)) : null,
   website ? el("p", {}, el("a", { href: website, rel: "noopener noreferrer nofollow", target: "_blank" }, website)) : null,
 ].filter(Boolean));
 art.classList.remove("hidden");
 
+function whoCanApply(j) {
+  const visas = j.eligible_visas || [];
+  return el("section", { class: "who-can-apply", "aria-labelledby": "who-h" },
+    el("h2", { id: "who-h" }, t("job.who_can_apply")),
+    visas.length
+      ? el("ul", {}, ...visas.map((v) => el("li", {}, t(`visa.${v}`),
+          (v === "ssw1" || v === "ssw2") && j.ssw_field ? ` (${t(`ssw.${j.ssw_field}`)})` : "")))
+      : el("p", {}, t("job.visa_not_specified")),
+    el("p", { class: "hint" }, t("job.visa_check_note"), " ", el("a", { href: p("legal/visa-guide.html") }, t("nav.visa_guide"))),
+  );
+}
+
 // ---------- Apply ----------
 const applyBox = $("#apply");
-if (job.status === "live") {
+if (job.status === "live" && job.external) {
+  applyBox.classList.remove("hidden");
+  const src = safeUrl(job.source_url || "");
+  $("#apply-form").replaceChildren(el("div", { class: "contact-box" },
+    el("div", {}, t("job.external_how")),
+    el("strong", {}, job.apply_contact || "—"),
+    el("p", { class: "hint" }, t("job.external_note")),
+    src ? el("p", { class: "hint" }, el("a", { href: src, target: "_blank", rel: "noopener noreferrer nofollow" }, t("job.external_source"))) : null,
+  ));
+} else if (job.status === "live") {
   applyBox.classList.remove("hidden");
   if (!profile) {
     $("#apply-form").replaceChildren(el("a", { class: "btn", href: `${BASE}login.html?next=${encodeURIComponent(location.pathname + location.search)}` }, t("job.login_to_apply")));

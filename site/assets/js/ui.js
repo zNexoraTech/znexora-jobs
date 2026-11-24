@@ -164,7 +164,9 @@ function renderFooter() {
       el("div", {}, el("h4", {}, CONFIG.SITE_NAME), el("p", {}, t("footer.about_text"))),
       col(t("footer.seekers"),
         el("a", { href: p("jobs.html") }, t("nav.jobs")),
+        el("a", { href: p("legal/visa-guide.html") }, t("nav.visa_guide")),
         el("a", { href: p("legal/seeker-guide.html") }, t("footer.guide")),
+        el("a", { href: p("share-job.html") }, t("nav.share_job")),
         el("a", { href: p("signup.html?role=seeker") }, t("home.cta_seeker"))),
       col(t("footer.company"),
         el("a", { href: p("signup.html?role=employer") }, t("home.cta_employer")),
@@ -210,4 +212,20 @@ export function mountTurnstile(container) {
 
 export function resetTurnstile() {
   if (window.turnstile) window.turnstile.reset();
+}
+
+// ---------- Visa (status of residence) helpers ----------
+export const VISAS = ["unrestricted", "student", "dependent", "designated", "engineer", "ssw1", "ssw2", "skilled", "nursing", "highly_skilled"];
+export const SSW_FIELDS = ["nursing_care", "building_cleaning", "manufacturing", "construction", "shipbuilding", "auto_repair", "aviation",
+  "accommodation", "auto_transport", "railway", "agriculture", "fishery", "food_manufacturing", "food_service", "forestry", "wood_industry"];
+export const PLATFORMS = ["facebook", "telegram", "line", "tiktok", "viber", "website", "other"];
+
+/** Checkbox list of visa types; returns a function that reads the checked codes */
+export function visaCheckboxes(container, selected = []) {
+  for (const v of VISAS) {
+    const box = el("input", { type: "checkbox", name: "visa", value: v });
+    box.checked = selected.includes(v);
+    container.append(el("label", { class: "inline visa-option" }, box, t(`visa.${v}`)));
+  }
+  return () => [...container.querySelectorAll("input[name=visa]:checked")].map((c) => c.value);
 }

@@ -20,10 +20,16 @@
     <div><label for="q" data-i18n="filter.keyword">Keyword</label><input type="text" id="q" name="q" maxlength="60"></div>
     <div><label for="pref" data-i18n="filter.prefecture">Prefecture</label><select id="pref" name="pref"></select></div>
     <div><label for="type" data-i18n="filter.job_type">Job type</label><select id="type" name="type"></select></div>
+    <div><label for="visa" data-i18n="filter.visa">My visa type</label><select id="visa" name="visa"></select></div>
     <div><label for="jp" data-i18n="filter.japanese">Japanese level required (max)</label><select id="jp" name="jp"></select></div>
     <div><button type="submit" data-i18n="filter.apply">Search</button></div>
   </form>
-  <p id="count" class="meta"></p>
+  <div class="row alert-actions">
+    <p id="count" class="meta"></p><span class="spacer"></span>
+    <button type="button" id="save-alert" class="secondary small" data-i18n="alerts.save">Email me new jobs like these</button>
+    <a class="btn secondary small" href="share-job.html" data-i18n="nav.share_job">Share a job you saw</a>
+  </div>
+  <div id="alert-msg"></div>
   <div id="results" class="job-list"></div>
   <div class="row u-mt16"><button id="prev" class="secondary" data-i18n="common.prev">Previous</button><button id="next" class="secondary" data-i18n="common.next">Next</button></div>
 </main>

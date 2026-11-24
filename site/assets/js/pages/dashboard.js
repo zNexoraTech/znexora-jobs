@@ -1,5 +1,5 @@
 import { BASE, p } from "../paths.js";
-import { initPage, $, el, showMsg, requireRole, fillPrefectureSelect, fillOptions, badge, formatDate, JOB_TYPES, JP_LEVELS } from "../ui.js";
+import { initPage, $, el, showMsg, requireRole, fillPrefectureSelect, fillOptions, badge, formatDate, prefectureName, JOB_TYPES, JP_LEVELS } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
 import { CONFIG } from "../config.js";
@@ -49,6 +49,34 @@ async function seeker() {
   });
 
   await loadApplications();
+  await loadAlerts();
+}
+
+async function loadAlerts() {
+  const box = $("#alerts");
+  const { data, error } = await sb.from("job_alerts").select("*").order("created_at");
+  if (error) { showMsg(box, t("common.error"), "err"); return; }
+  if (!data.length) { box.replaceChildren(el("p", { class: "meta" }, t("alerts.none"))); return; }
+  box.replaceChildren(...data.map((a) => {
+    const parts = [
+      a.keyword && `"${a.keyword}"`,
+      a.prefecture && prefectureName(a.prefecture),
+      a.job_type && t(`jobtype.${a.job_type}`),
+      a.jp_max && `${t("job.japanese")}: ${t(`jp.${a.jp_max}`)}`,
+      a.visa && t(`visa.${a.visa}`),
+    ].filter(Boolean);
+    return el("div", { class: "alert-row" },
+      el("div", { class: "tags" }, ...(parts.length ? parts : [t("alerts.all_jobs")]).map((x) => el("span", { class: "tag" }, x))),
+      el("span", { class: "spacer" }),
+      el("span", { class: `badge ${a.active ? "ok" : "closed"}` }, t(a.active ? "alerts.on" : "alerts.off")),
+      el("button", { class: "secondary small", onclick: async () => {
+        await sb.from("job_alerts").update({ active: !a.active }).eq("id", a.id); loadAlerts();
+      } }, t(a.active ? "alerts.pause" : "alerts.resume")),
+      el("button", { class: "secondary small", onclick: async () => {
+        await sb.from("job_alerts").delete().eq("id", a.id); loadAlerts();
+      } }, t("alerts.delete")),
+    );
+  }));
 }
 
 async function loadApplications() {
@@ -86,7 +114,10 @@ async function employer() {
     $("#c-phone").value = c?.phone || "";
     $("#c-web").value = c?.website || "";
     $("#c-desc").value = c?.description || "";
-    $("#verified").replaceChildren(c ? el("span", { class: `badge ${c.verified ? "ok" : "pending"}` }, t(c.verified ? "dash.verified" : "dash.not_verified")) : "");
+    $("#verified").replaceChildren(...(c ? [
+      el("span", { class: `badge ${c.verified ? "ok" : "pending"}` }, t(c.verified ? "dash.verified" : "dash.not_verified")),
+      c.verified && c.auto_publish ? el("span", { class: "badge ok" }, t("dash.instant_on")) : null,
+    ].filter(Boolean) : []));
     const post = $("#post-btn");
     post.classList.toggle("hidden", !c);
   };
