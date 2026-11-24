@@ -1,3 +1,4 @@
+import { BASE } from "./paths.js";
 // Simple i18n: English (en), Burmese (my), Japanese (ja)
 // Text lives in /i18n/<lang>.json. Elements use:
 //   data-i18n="key"              -> textContent
@@ -24,7 +25,7 @@ export async function loadLang(lang = detectLang()) {
   current = lang;
   document.documentElement.lang = lang;
   const get = async (l) => {
-    const r = await fetch(`/i18n/${l}.json`, { cache: "no-cache" });
+    const r = await fetch(`${BASE}i18n/${l}.json`, { cache: "no-cache" });
     return r.ok ? r.json() : {};
   };
   fallback = await get("en");

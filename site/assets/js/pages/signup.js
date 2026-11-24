@@ -1,9 +1,10 @@
+import { p, url } from "../paths.js";
 import { initPage, $, showMsg, qs, mountTurnstile, resetTurnstile } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t, currentLang } from "../i18n.js";
 
 const profile = await initPage();
-if (profile) location.href = "/dashboard.html";
+if (profile) location.href = p("dashboard.html");
 
 if (qs("role") === "employer") document.querySelector('input[name=role][value=employer]').checked = true;
 const getToken = mountTurnstile($("#turnstile"));
@@ -17,7 +18,7 @@ $("#signup-form").addEventListener("submit", async (e) => {
     password: $("#password").value,
     options: {
       data: { role, display_name: $("#name").value.trim(), language: currentLang() },
-      emailRedirectTo: `${location.origin}/login.html`,
+      emailRedirectTo: url("login.html"),
       captchaToken: getToken(),
     },
   });

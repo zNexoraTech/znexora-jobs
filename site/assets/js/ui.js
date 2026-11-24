@@ -1,3 +1,4 @@
+import { BASE, p } from "./paths.js";
 // Shared UI helpers: header, footer, safe DOM building, formatting.
 // SECURITY: never use innerHTML with user data. Use el() / textContent.
 import { CONFIG } from "./config.js";
@@ -72,9 +73,9 @@ export function badge(status) {
 }
 
 export function prefectureName(en) {
-  const p = PREFECTURES.find((x) => x[0] === en);
-  if (!p) return en;
-  return currentLang() === "ja" ? p[1] : p[0];
+  const pref = PREFECTURES.find((x) => x[0] === en);
+  if (!pref) return en;
+  return currentLang() === "ja" ? pref[1] : pref[0];
 }
 
 export function fillPrefectureSelect(select, { withAny = false } = {}) {
@@ -121,19 +122,19 @@ function renderHeader(profile) {
     if (code === currentLang()) o.selected = true;
     langSel.append(o);
   }
-  const nav = el("nav", { class: "nav" }, el("a", { href: "/jobs.html" }, t("nav.jobs")));
+  const nav = el("nav", { class: "nav" }, el("a", { href: p("jobs.html") }, t("nav.jobs")));
   if (profile) {
-    if (profile.role === "employer") nav.append(el("a", { href: "/post-job.html" }, t("nav.post_job")));
-    nav.append(el("a", { href: "/dashboard.html" }, t("nav.dashboard")));
-    if (profile.role === "admin") nav.append(el("a", { href: "/admin.html" }, t("nav.admin")));
-    nav.append(el("button", { class: "linklike", onclick: async () => { await sb.auth.signOut(); location.href = "/"; } }, t("nav.logout")));
+    if (profile.role === "employer") nav.append(el("a", { href: p("post-job.html") }, t("nav.post_job")));
+    nav.append(el("a", { href: p("dashboard.html") }, t("nav.dashboard")));
+    if (profile.role === "admin") nav.append(el("a", { href: p("admin.html") }, t("nav.admin")));
+    nav.append(el("button", { class: "linklike", onclick: async () => { await sb.auth.signOut(); location.href = p(""); } }, t("nav.logout")));
   } else {
-    nav.append(el("a", { href: "/login.html" }, t("nav.login")), el("a", { href: "/signup.html" }, t("nav.signup")));
+    nav.append(el("a", { href: p("login.html") }, t("nav.login")), el("a", { href: p("signup.html") }, t("nav.signup")));
   }
   nav.append(langSel);
   const [a, b] = splitName(CONFIG.SITE_NAME);
   host.className = "site-header";
-  host.replaceChildren(el("div", { class: "wrap" }, el("a", { class: "brand", href: "/" }, a, el("span", {}, b)), nav));
+  host.replaceChildren(el("div", { class: "wrap" }, el("a", { class: "brand", href: p("") }, a, el("span", {}, b)), nav));
 }
 
 function splitName(name) {
@@ -146,11 +147,11 @@ function renderFooter() {
   if (!host) return;
   host.className = "site-footer";
   const links = el("div", { class: "links" },
-    el("a", { href: "/about.html" }, t("footer.about")),
-    el("a", { href: "/legal/seeker-guide.html" }, t("footer.guide")),
-    el("a", { href: "/legal/posting-rules.html" }, t("footer.rules")),
-    el("a", { href: "/legal/terms.html" }, t("footer.terms")),
-    el("a", { href: "/legal/privacy.html" }, t("footer.privacy")),
+    el("a", { href: p("about.html") }, t("footer.about")),
+    el("a", { href: p("legal/seeker-guide.html") }, t("footer.guide")),
+    el("a", { href: p("legal/posting-rules.html") }, t("footer.rules")),
+    el("a", { href: p("legal/terms.html") }, t("footer.terms")),
+    el("a", { href: p("legal/privacy.html") }, t("footer.privacy")),
     el("a", { href: `mailto:${CONFIG.CONTACT_EMAIL}` }, t("footer.contact")),
   );
   const lines = [el("div", {}, t("footer.notice"))];
@@ -162,15 +163,15 @@ function renderFooter() {
 
 /** Redirect to login if not signed in, or home if wrong role. */
 export function requireRole(profile, roles) {
-  if (!profile) { location.href = `/login.html?next=${encodeURIComponent(location.pathname + location.search)}`; return false; }
+  if (!profile) { location.href = `${BASE}login.html?next=${encodeURIComponent(location.pathname + location.search)}`; return false; }
   if (profile.suspended) { document.body.textContent = t("common.suspended"); return false; }
-  if (roles && !roles.includes(profile.role)) { location.href = "/dashboard.html"; return false; }
+  if (roles && !roles.includes(profile.role)) { location.href = p("dashboard.html"); return false; }
   return true;
 }
 
 /** Only allow redirects to our own paths */
 export function safeNext(next) {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard.html";
+  return next && next.startsWith("/") && !next.startsWith("//") ? next : p("dashboard.html");
 }
 
 /** Cloudflare Turnstile (optional). Returns a function that gives the current token. */

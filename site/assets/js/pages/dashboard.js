@@ -1,3 +1,4 @@
+import { BASE, p } from "../paths.js";
 import { initPage, $, el, showMsg, requireRole, fillPrefectureSelect, fillOptions, badge, formatDate, JOB_TYPES, JP_LEVELS } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
@@ -60,7 +61,7 @@ async function loadApplications() {
   box.replaceChildren(el("table", {},
     el("thead", {}, el("tr", {}, el("th", {}, t("post.job_title")), el("th", {}, t("job.company")), el("th", {}, t("app.status")), el("th", {}, t("job.posted")), el("th", {}))),
     el("tbody", {}, ...data.map((a) => el("tr", {},
-      el("td", {}, el("a", { href: `/job.html?id=${encodeURIComponent(a.job_id)}` }, a.jobs?.title || "—")),
+      el("td", {}, el("a", { href: `${BASE}job.html?id=${encodeURIComponent(a.job_id)}` }, a.jobs?.title || "—")),
       el("td", {}, a.jobs?.employers?.company_name || ""),
       el("td", {}, badge(a.status)),
       el("td", {}, formatDate(a.created_at)),
@@ -123,12 +124,12 @@ async function loadJobs(company) {
   box.replaceChildren(el("table", {},
     el("thead", {}, el("tr", {}, el("th", {}, t("post.job_title")), el("th", {}, t("app.status")), el("th", {}, t("dash.applicants")), el("th", {}))),
     el("tbody", {}, ...data.map((j) => el("tr", {},
-      el("td", {}, el("a", { href: `/job.html?id=${encodeURIComponent(j.id)}` }, j.title),
+      el("td", {}, el("a", { href: `${BASE}job.html?id=${encodeURIComponent(j.id)}` }, j.title),
         j.status === "rejected" && j.reject_reason ? el("div", { class: "hint" }, j.reject_reason) : null),
       el("td", {}, badge(j.status)),
-      el("td", {}, el("a", { href: `/applicants.html?job=${encodeURIComponent(j.id)}` }, String(j.applications?.[0]?.count ?? 0))),
+      el("td", {}, el("a", { href: `${BASE}applicants.html?job=${encodeURIComponent(j.id)}` }, String(j.applications?.[0]?.count ?? 0))),
       el("td", { class: "row" },
-        el("a", { class: "btn secondary small", href: `/post-job.html?id=${encodeURIComponent(j.id)}` }, t("dash.edit")),
+        el("a", { class: "btn secondary small", href: `${BASE}post-job.html?id=${encodeURIComponent(j.id)}` }, t("dash.edit")),
         j.status !== "closed" ? el("button", { class: "secondary small", onclick: async () => {
           await sb.from("jobs").update({ status: "closed" }).eq("id", j.id);
           loadJobs(company);
@@ -148,5 +149,5 @@ $("#delete-account").addEventListener("click", async () => {
   });
   if (!res.ok) { showMsg("#account-msg", t("common.error"), "err"); return; }
   await sb.auth.signOut();
-  location.href = "/";
+  location.href = p("");
 });

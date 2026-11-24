@@ -1,3 +1,4 @@
+import { BASE } from "../paths.js";
 import { initPage, $, el, qs, isUuid, showMsg, formatWage, formatDate, prefectureName, safeUrl, fillOptions, REPORT_REASONS } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
@@ -39,7 +40,7 @@ const applyBox = $("#apply");
 if (job.status === "live") {
   applyBox.classList.remove("hidden");
   if (!profile) {
-    $("#apply-form").replaceChildren(el("a", { class: "btn", href: `/login.html?next=${encodeURIComponent(location.pathname + location.search)}` }, t("job.login_to_apply")));
+    $("#apply-form").replaceChildren(el("a", { class: "btn", href: `${BASE}login.html?next=${encodeURIComponent(location.pathname + location.search)}` }, t("job.login_to_apply")));
   } else if (profile.role !== "seeker") {
     $("#apply-form").replaceChildren(el("p", { class: "meta" }, t("job.employers_cannot_apply")));
   } else {

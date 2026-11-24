@@ -1,3 +1,4 @@
+import { url } from "../paths.js";
 import { initPage, $, showMsg, qs, safeNext, mountTurnstile, resetTurnstile } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
@@ -24,7 +25,7 @@ $("#login-form").addEventListener("submit", async (e) => {
 $("#forgot").addEventListener("click", async () => {
   const email = $("#email").value.trim();
   if (!email) { showMsg("#msg", t("auth.enter_email_first"), "info"); return; }
-  await sb.auth.resetPasswordForEmail(email, { redirectTo: `${location.origin}/update-password.html`, captchaToken: getToken() });
+  await sb.auth.resetPasswordForEmail(email, { redirectTo: url("update-password.html"), captchaToken: getToken() });
   // Same message whether or not the email exists (no account enumeration)
   showMsg("#msg", t("auth.reset_sent"), "ok");
 });

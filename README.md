@@ -53,7 +53,17 @@ docs/
 ### 3. Edit the config
 Open `site/assets/js/config.js` and paste the Project URL and anon key. Commit the change.
 
-### 4. Deploy on Cloudflare Pages
+### 4. Deploy (choose A or B)
+
+**A. GitHub Pages — quickest for testing**
+1. GitHub Pages is free only for **public** repos (private needs GitHub Pro). A public repo is OK for testing: the anon key is meant to be public and the database rules protect the data. Just never commit the `service_role` key.
+2. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+3. Push to `main` (or Actions tab → "Deploy site to GitHub Pages" → Run workflow). The included `.github/workflows/pages.yml` publishes the `site/` folder.
+4. Open `https://YOUR-USERNAME.github.io/REPO-NAME/` (shown in Settings → Pages after the first run).
+5. In Supabase → Authentication → URL Configuration: set Site URL to that address, and add `https://YOUR-USERNAME.github.io/REPO-NAME/**` to Redirect URLs.
+6. Note: GitHub Pages ignores `_headers`; each page has a Content-Security-Policy meta tag instead. GitHub's terms don't allow running a commercial service on GitHub Pages, so **move to Cloudflare Pages (B) before public launch**.
+
+**B. Cloudflare Pages — for production**
 1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git** → choose the repo.
 2. Build settings: Framework preset **None**, Build command **(leave empty)**, Build output directory **`site`**.
 3. Deploy. You get `https://<project>.pages.dev`.
@@ -66,7 +76,7 @@ supabase login
 supabase link --project-ref YOUR-PROJECT-REF
 supabase functions deploy delete-account
 ```
-Edit `ALLOWED_ORIGINS` in `supabase/functions/delete-account/index.ts` to your real domain first.
+Edit `ALLOWED_ORIGINS` in `supabase/functions/delete-account/index.ts` first: add your site's origin (for GitHub Pages that's `https://YOUR-USERNAME.github.io`, without the repo name).
 
 ### 6. Create test users and make yourself admin
 1. On your site, sign up: one admin account (as job seeker), two employers, two job seekers. Confirm each email.

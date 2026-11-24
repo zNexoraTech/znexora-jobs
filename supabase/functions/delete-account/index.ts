@@ -12,6 +12,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const ALLOWED_ORIGINS = [
   "http://localhost:8788",
   "https://znexora-jobs.pages.dev",
+  "https://YOUR-GITHUB-USERNAME.github.io",   // GitHub Pages (origin has no repo path)
 ];
 
 function cors(origin: string | null) {

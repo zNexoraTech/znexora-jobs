@@ -1,3 +1,4 @@
+import { BASE } from "../paths.js";
 import { initPage, $, el, showMsg, requireRole, badge, formatDate, formatWage, prefectureName, safeUrl } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
@@ -93,7 +94,7 @@ async function reports() {
   panel.replaceChildren(...data.map((r) => el("div", { class: "card" },
     el("div", { class: "row" }, el("h3", {}, t(`reason.${r.reason}`)), el("span", { class: "spacer" }), el("span", { class: "meta" }, formatDate(r.created_at))),
     el("div", { class: "meta" }, r.employers?.company_name || ""),
-    r.jobs ? el("p", {}, el("a", { href: `/job.html?id=${encodeURIComponent(r.jobs.id)}` }, r.jobs.title), " ", badge(r.jobs.status)) : null,
+    r.jobs ? el("p", {}, el("a", { href: `${BASE}job.html?id=${encodeURIComponent(r.jobs.id)}` }, r.jobs.title), " ", badge(r.jobs.status)) : null,
     r.details ? el("p", { class: "description" }, r.details) : null,
     el("div", { class: "row" },
       r.jobs && r.jobs.status === "live" ? el("button", { class: "danger", onclick: async () => {

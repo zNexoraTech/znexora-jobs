@@ -1,3 +1,4 @@
+import { p } from "../paths.js";
 import { initPage, $, showMsg, requireRole, qs, isUuid, fillPrefectureSelect, fillOptions, JOB_TYPES, JP_LEVELS, WAGE_TYPES } from "../ui.js";
 import { sb } from "../supabase.js";
 import { t } from "../i18n.js";
@@ -44,7 +45,7 @@ async function save(status) {
   const res = editId ? await sb.from("jobs").update(row).eq("id", editId) : await sb.from("jobs").insert(row);
   if (res.error) { showMsg("#msg", t("common.error"), "err"); return; }
   showMsg("#msg", status === "draft" ? t("dash.saved") : t("post.submitted"), "ok");
-  setTimeout(() => { location.href = "/dashboard.html"; }, 1200);
+  setTimeout(() => { location.href = p("dashboard.html"); }, 1200);
 }
 
 $("#job-form").addEventListener("submit", (e) => { e.preventDefault(); save("pending"); });
