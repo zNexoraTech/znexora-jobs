@@ -7,8 +7,8 @@ export const CONFIG = {
   SITE_NAME: "ZNexora Jobs",
 
   // Supabase -> Project Settings -> API
-  SUPABASE_URL: "https://dslybmgvlhhkkguhnanb.supabase.co",
-  SUPABASE_ANON_KEY: "sb_publishable_9WkhSmS7y0jgi3ocyXuS1A_QeMtcoTJ",
+  SUPABASE_URL: "https://YOUR-PROJECT-REF.supabase.co",
+  SUPABASE_ANON_KEY: "YOUR-ANON-PUBLIC-KEY",
 
   // Cloudflare Turnstile site key. Leave "" until you enable CAPTCHA in
   // Supabase -> Authentication -> Attack Protection (with the secret key).

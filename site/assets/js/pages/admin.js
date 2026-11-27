@@ -3,6 +3,7 @@ import { initPage, $, el, showMsg, requireRole, badge, formatDate, formatWage, p
 import { sb } from "../supabase.js";
 import { buildXlsx, downloadBlob } from "../xlsx.js";
 import { t } from "../i18n.js";
+import { CONFIG } from "../config.js";
 
 const profile = await initPage();
 if (!requireRole(profile, ["admin"])) throw new Error("auth");
@@ -24,6 +25,7 @@ async function load(tab) {
   if (tab === "import") return importForm();
   if (tab === "trusted") return trusted();
   if (tab === "excel") return excel();
+  if (tab === "robot") return robot();
 }
 
 const empty = () => panel.replaceChildren(el("p", { class: "meta" }, t("admin.empty")));
@@ -294,3 +296,122 @@ function excel() {
 }
 
 load("employers");
+
+// ---------- Daily robot: collects jobs every day (daily-collector function) ----------
+async function robot() {
+  const [{ data: st, error: e1 }, { data: searches, error: e2 }, { data: runs, error: e3 }] = await Promise.all([
+    sb.from("collector_settings").select("*").eq("id", 1).maybeSingle(),
+    sb.from("collector_searches").select("*").order("created_at"),
+    sb.from("collector_runs").select("*").order("started_at", { ascending: false }).limit(14),
+  ]);
+  if (e1 || e2 || e3 || !st) { showMsg("#msg", t("robot.need_006"), "err"); panel.replaceChildren(); return; }
+
+  const save = async (patch) => {
+    const { error } = await sb.from("collector_settings").update(patch).eq("id", 1);
+    if (error) return fail();
+    showMsg("#msg", t("dash.saved"), "ok");
+    robot();
+  };
+  const toggle = (label, field) => el("label", { class: "inline" },
+    el("input", { type: "checkbox", checked: !!st[field], onchange: (e) => save({ [field]: e.target.checked }) }), label);
+  const number = (id, label, field, min, max) => {
+    const input = el("input", { type: "number", id, min, max, value: st[field] });
+    input.addEventListener("change", () => {
+      const v = parseInt(input.value, 10);
+      if (Number.isFinite(v) && v >= min && v <= max) save({ [field]: v }); else input.value = st[field];
+    });
+    return el("div", {}, el("label", { for: id }, label), input);
+  };
+  const mode = el("select", { id: "rb-mode" },
+    el("option", { value: "live" }, t("robot.mode_live")), el("option", { value: "review" }, t("robot.mode_review")));
+  mode.value = st.publish_mode;
+  mode.addEventListener("change", () => save({ publish_mode: mode.value }));
+
+  const runMsg = el("p", { class: "meta" });
+  const runBtn = el("button", { onclick: async () => {
+    runBtn.disabled = true; runMsg.textContent = t("robot.running");
+    const { data: { session } } = await sb.auth.getSession();
+    const res = await fetch(`${CONFIG.SUPABASE_URL}/functions/v1/daily-collector`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${session?.access_token}`, apikey: CONFIG.SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+      body: "{}",
+    }).catch(() => null);
+    runBtn.disabled = false;
+    if (!res) { runMsg.textContent = t("robot.not_deployed"); return; }
+    const body = await res.json().catch(() => ({}));
+    if (res.status === 429) { runMsg.textContent = t("robot.wait"); return; }
+    if (!res.ok) { runMsg.textContent = `${t("robot.not_deployed")} (${res.status} ${body.error || ""})`; return; }
+    robot();
+  } }, t("robot.run_now"));
+
+  const left = Math.max(0, st.jooble_total_limit - st.jooble_requests_used);
+  const settings = el("div", { class: "card grid grid-2" },
+    el("h2", { class: "u-full" }, t("robot.settings")),
+    el("p", { class: "hint u-full" }, t("robot.hint")),
+    el("div", { class: "u-full" }, toggle(t("robot.enabled"), "enabled")),
+    el("div", {}, el("label", { for: "rb-mode" }, t("robot.mode")), mode),
+    number("rb-daily", t("robot.daily_requests"), "jooble_daily_requests", 0, 50),
+    el("div", { class: "u-full" }, toggle(t("robot.share"), "share_collected")),
+    number("rb-share", t("robot.share_limit"), "share_daily_limit", 0, 100),
+    number("rb-unseen", t("robot.unseen_days"), "unseen_days", 1, 60),
+    number("rb-age", t("robot.max_age"), "max_age_days", 7, 60),
+    el("p", { class: `msg ${left < 60 ? "err" : "info"} u-full` },
+      t("robot.allowance", { used: st.jooble_requests_used, total: st.jooble_total_limit, left })),
+    el("div", { class: "u-full row" }, runBtn, runMsg),
+  );
+
+  // Saved searches
+  const kw = el("input", { type: "text", id: "rb-kw", required: true, minlength: 2, maxlength: 100, placeholder: "外国人歓迎" });
+  const loc = el("input", { type: "text", id: "rb-loc", maxlength: 60, placeholder: "東京都" });
+  const addForm = el("form", { class: "row" },
+    el("div", {}, el("label", { for: "rb-kw" }, t("robot.keywords")), kw),
+    el("div", {}, el("label", { for: "rb-loc" }, t("robot.location")), loc),
+    el("button", { type: "submit" }, t("robot.add_search")));
+  addForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const { error } = await sb.from("collector_searches").insert({ keywords: kw.value.trim(), location: loc.value.trim() });
+    if (error) return fail();
+    robot();
+  });
+  const searchList = el("div", { class: "card" },
+    el("h2", {}, t("robot.searches")),
+    el("p", { class: "hint" }, t("robot.searches_hint")),
+    ...(searches || []).map((q) => el("div", { class: "row" },
+      el("strong", {}, q.keywords), el("span", { class: "meta" }, q.location || t("robot.all_japan")),
+      el("span", { class: "meta" }, q.last_status || t("robot.not_run")),
+      el("span", { class: "spacer" }),
+      el("button", { class: "secondary small", onclick: async () => {
+        const { error } = await sb.from("collector_searches").update({ active: !q.active }).eq("id", q.id);
+        if (error) return fail(); robot();
+      } }, t(q.active ? "admin.turn_off" : "admin.turn_on")),
+      el("button", { class: "secondary small", onclick: async () => {
+        const { error } = await sb.from("collector_searches").delete().eq("id", q.id);
+        if (error) return fail(); robot();
+      } }, t("alerts.delete")))),
+    addForm);
+
+  // Run history
+  const cell = (v) => el("td", {}, String(v ?? ""));
+  const summary = (d) => {
+    const parts = [];
+    for (const [k, v] of Object.entries(d || {})) {
+      if (typeof v === "string") parts.push(`${k}: ${v}`);
+      else for (const [k2, v2] of Object.entries(v || {})) parts.push(`${k} · ${k2}: ${v2}`);
+    }
+    return parts.join("\n");
+  };
+  const history = el("div", { class: "card" },
+    el("h2", {}, t("robot.history")),
+    !(runs || []).length ? el("p", { class: "meta" }, t("robot.no_runs")) :
+    el("div", { class: "table-scroll" }, el("table", {},
+      el("thead", {}, el("tr", {}, ...["robot.when", "robot.added", "robot.updated", "robot.closed", "robot.review", "robot.result"]
+        .map((k) => el("th", {}, t(k))))),
+      el("tbody", {}, ...runs.map((r) => el("tr", {},
+        cell(`${new Date(r.started_at).toLocaleString()}${r.trigger === "manual" ? " (manual)" : ""}`),
+        cell(r.added), cell(r.updated), cell(r.closed), cell(r.for_review),
+        el("td", {}, el("span", { class: `badge ${r.ok ? "ok" : r.ok === false ? "bad" : "pending"}` },
+          t(r.ok ? "robot.ok" : r.ok === false ? "robot.problem" : "robot.running_short")),
+          el("pre", { class: "hint u-pre" }, summary(r.details)))))))));
+
+  panel.replaceChildren(settings, searchList, history);
+}

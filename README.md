@@ -33,11 +33,13 @@ supabase/
   functions/share-job/        ← auto-post new jobs to Telegram / Facebook Page
   migrations/003_job_import.sql ← job feeds
   migrations/004_categories.sql ← industry categories (auto-sorted)
+  migrations/005_grants.sql   ← table permissions for visitors / logged-in users
   functions/import-feeds/     ← daily import from careers pages / XML feeds
   functions/careerjet-search/ ← "More jobs from other sites"
   functions/_shared/          ← feed parser + safe URL fetching
   seed.sql                    ← dummy data + make yourself admin (staging only)
 docs/
+  DAILY-COLLECTOR.md      ← the daily robot: collects jobs automatically every morning (step by step)
   COLLECTING-JOBS.md      ← how jobs are collected (multi-job form, feeds, Careerjet, Hello Work) and the robot workflow
   SECURITY-CHECKLIST.md
   LAUNCH-CHECKLIST.md
@@ -52,7 +54,7 @@ docs/
 ### 2. Create the Supabase project (staging)
 1. Go to supabase.com → New project → name `znexora-jobs-staging`, region **Tokyo (ap-northeast-1)**, strong DB password.
 2. **SQL Editor** → New query → paste all of `supabase/migrations/001_schema.sql` → **Run**. It should finish with "Success".
-3. Run `002_visas_autopublish_tips_alerts.sql`, `003_job_import.sql` and `004_categories.sql` the same way, in that order (visas, instant publishing, shared jobs, alerts). See `docs/SOCIAL-AND-ALERTS.md` for the email-alert and Facebook/Telegram setup.
+3. Run `002_visas_autopublish_tips_alerts.sql`, `003_job_import.sql`, `004_categories.sql` and **`005_grants.sql`** the same way, in that order. (005 gives the website permission to use the tables; without it login works but you get "42501 permission denied".) (visas, instant publishing, shared jobs, alerts). See `docs/SOCIAL-AND-ALERTS.md` for the email-alert and Facebook/Telegram setup.
 4. **Authentication → Sign In / Providers → Email**: keep email sign-up on and **Confirm email ON**. Set minimum password length to 10.
 5. **Authentication → URL Configuration**:
    - Site URL: your Cloudflare address (step 3), e.g. `https://znexora-jobs.pages.dev`

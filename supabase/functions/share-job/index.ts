@@ -56,6 +56,15 @@ Deno.serve(async (req) => {
   const { data: fresh } = await db.from("jobs").select("*, employers(company_name, verified)").eq("id", job.id).maybeSingle();
   if (!fresh || fresh.status !== "live" || fresh.shared_at || !fresh.employers?.verified) return new Response("skip");
 
+  // Jobs collected by the daily robot: only if switched on in Admin -> Daily robot, and at most N a day
+  if (fresh.collector_source) {
+    const { data: cs } = await db.from("collector_settings").select("share_collected, share_daily_limit").eq("id", 1).maybeSingle();
+    if (!cs?.share_collected) return new Response("skip: sharing collected jobs is off");
+    const { count } = await db.from("jobs").select("id", { count: "exact", head: true })
+      .not("collector_source", "is", null).gte("shared_at", new Date(Date.now() - 864e5).toISOString());
+    if ((count ?? 0) >= cs.share_daily_limit) return new Response("skip: daily limit for collected jobs reached");
+  }
+
   // Claim it first so two webhook calls can't double-post
   const { data: claimed } = await db.from("jobs").update({ shared_at: new Date().toISOString() })
     .eq("id", job.id).is("shared_at", null).select("id");

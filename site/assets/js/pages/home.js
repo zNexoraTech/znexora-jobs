@@ -18,7 +18,7 @@ else box.replaceChildren(...data.map(jobCard));
 if (!error && count) $("#hero-count").textContent = t("home.count", { n: count });
 
 // Companies hiring now (verified employers only; visitors can read just these columns)
-const { data: emps } = await sb.from("employers").select("id, company_name").eq("verified", true).order("company_name").limit(12);
+const { data: emps } = await sb.from("employers").select("id, company_name").eq("verified", true).eq("collected", false).order("company_name").limit(12);
 if (emps && emps.length) {
   $("#employers").replaceChildren(...emps.map((e) =>
     el("a", { class: "employer-chip", href: `${BASE}jobs.html?emp=${encodeURIComponent(e.id)}` },

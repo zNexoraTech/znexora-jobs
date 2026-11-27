@@ -1,5 +1,7 @@
 # Collecting jobs: what to prepare and how to switch each source on
 
+> **Automatic daily collection:** see [DAILY-COLLECTOR.md](DAILY-COLLECTOR.md). The daily robot now runs the employer feeds below every morning, so you no longer need the separate `import-feeds` schedule in Step 2.
+
 There are five ways jobs get onto the site. 1 to 3 work as soon as Supabase is set up. 4 and 5 need outside accounts or approval.
 
 | # | Source | Who uses it | Needs |
