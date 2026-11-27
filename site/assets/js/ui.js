@@ -2,7 +2,7 @@ import { BASE, p } from "./paths.js";
 // Shared UI helpers: header, footer, safe DOM building, formatting.
 // SECURITY: never use innerHTML with user data. Use el() / textContent.
 import { CONFIG } from "./config.js";
-import { sb, getProfile } from "./supabase.js";
+import { sb, getProfile, profileProblem } from "./supabase.js";
 import { LANGS, loadLang, setLang, currentLang, t } from "./i18n.js";
 
 /** Build an element safely. Children: strings become text nodes. */
@@ -182,6 +182,16 @@ function renderFooter() {
 
 /** Redirect to login if not signed in, or home if wrong role. */
 export function requireRole(profile, roles) {
+  if (!profile && profileProblem) {
+    // Logged in, but the profile can't be read: explain instead of bouncing back to the login page
+    const main = document.querySelector("main") || document.body;
+    main.replaceChildren(el("div", { class: "card form-narrow" },
+      el("h1", {}, "Couldn't load your account"),
+      el("p", {}, "You are logged in, but your profile couldn't be read from the database. Send this message to the site admin:"),
+      el("pre", { class: "msg err" }, profileProblem),
+      el("button", { class: "secondary", onclick: async () => { await sb.auth.signOut(); location.href = p(""); } }, "Log out")));
+    return false;
+  }
   if (!profile) { location.href = `${BASE}login.html?next=${encodeURIComponent(location.pathname + location.search)}`; return false; }
   if (profile.suspended) { document.body.textContent = t("common.suspended"); return false; }
   if (roles && !roles.includes(profile.role)) { location.href = p("dashboard.html"); return false; }

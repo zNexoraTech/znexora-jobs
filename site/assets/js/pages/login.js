@@ -1,6 +1,6 @@
 import { url } from "../paths.js";
 import { initPage, $, el, showMsg, qs, safeNext, mountTurnstile, resetTurnstile } from "../ui.js";
-import { sb } from "../supabase.js";
+import { sb, getProfile, profileProblem } from "../supabase.js";
 import { t } from "../i18n.js";
 
 // Text with an English fallback, so this page works even before new translations are uploaded
@@ -16,7 +16,9 @@ function explain(error) {
   const status = error?.status || "";
   const raw = String(error?.message || error || "");
   let text;
-  if (code === "invalid_credentials" || /invalid login credentials/i.test(raw)) {
+  if (/^Logged in, but/.test(raw)) {
+    text = tx("auth.err_profile", "You're logged in, but your account couldn't be loaded from the database. Send the details below to the site admin.");
+  } else if (code === "invalid_credentials" || /invalid login credentials/i.test(raw)) {
     text = tx("auth.err_invalid", "Email or password is incorrect. Check for typing mistakes, or use \"Forgot password?\".");
   } else if (code === "email_not_confirmed" || /email not confirmed/i.test(raw)) {
     text = tx("auth.err_not_confirmed", "Your email address isn't confirmed yet. Click the link in the confirmation email first.");
@@ -48,6 +50,9 @@ form.addEventListener("submit", async (e) => {
     });
     if (error) { explain(error); resetTurnstile(); return; }
     if (!data?.session) { explain({ message: "no session returned" }); return; }
+    // Make sure the profile can be read before leaving this page (otherwise we'd bounce back here)
+    const prof = await getProfile(data.user);
+    if (!prof) { explain({ message: `Logged in, but your profile couldn't be loaded: ${profileProblem || "unknown"}` }); return; }
     showMsg("#msg", tx("auth.logged_in", "Logged in. Opening your dashboard…"), "ok");
     location.href = safeNext(qs("next"));
   } catch (err) {

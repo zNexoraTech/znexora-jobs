@@ -12,9 +12,20 @@ export async function getUser() {
 }
 
 /** Current user's profile row (role, language...) or null */
-export async function getProfile() {
-  const user = await getUser();
+/** Last problem reading the profile while logged in (shown instead of a silent redirect) */
+export let profileProblem = null;
+
+export async function getProfile(knownUser = null) {
+  profileProblem = null;
+  const user = knownUser || await getUser();
   if (!user) return null;
-  const { data } = await sb.from("profiles").select("id, role, display_name, language, suspended").eq("id", user.id).maybeSingle();
+  const { data, error } = await sb.from("profiles").select("id, role, display_name, language, suspended").eq("id", user.id).maybeSingle();
+  if (error) {
+    profileProblem = `${error.code || ""} ${error.message || ""}`.trim();
+    console.error("Profile could not be loaded:", error);
+  } else if (!data) {
+    profileProblem = "no profile row for this account";
+    console.error("Logged in, but no profile row exists for user", user.id);
+  }
   return data;
 }
