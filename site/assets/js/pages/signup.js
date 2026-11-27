@@ -7,7 +7,7 @@ const profile = await initPage();
 if (profile) location.href = p("dashboard.html");
 
 if (qs("role") === "employer") document.querySelector('input[name=role][value=employer]').checked = true;
-const getToken = mountTurnstile($("#turnstile"));
+const getToken = mountTurnstile($("#captcha-box"));
 
 $("#signup-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -23,11 +23,12 @@ $("#signup-form").addEventListener("submit", async (e) => {
     },
   });
   if (error) {
-    showMsg("#msg", error.message, "err");
-    resetTurnstile();
     btn.disabled = false;
+    showMsg("#msg", `${error.message}${error.code ? ` (${error.code})` : ""}`, "err");
+    resetTurnstile();
     return;
   }
+  btn.disabled = false;
   $("#signup-form").reset();
   showMsg("#msg", t("auth.signup_ok"), "ok");
 });

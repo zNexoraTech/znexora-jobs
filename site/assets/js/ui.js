@@ -193,16 +193,20 @@ export function safeNext(next) {
   return next && next.startsWith("/") && !next.startsWith("//") ? next : p("dashboard.html");
 }
 
-/** Cloudflare Turnstile (optional). Returns a function that gives the current token. */
+/** Cloudflare Turnstile (optional). Returns a function that gives the current token.
+ *  Note: an element with id="turnstile" would also appear as window.turnstile, so we always
+ *  check that the real Turnstile API (with render/reset functions) is loaded. */
+const turnstileApi = () => (typeof window.turnstile?.render === "function" ? window.turnstile : null);
+
 export function mountTurnstile(container) {
   if (!CONFIG.TURNSTILE_SITE_KEY || !container) return () => undefined;
   let token;
-  const render = () => window.turnstile.render(container, {
+  const render = () => turnstileApi()?.render(container, {
     sitekey: CONFIG.TURNSTILE_SITE_KEY,
     callback: (tk) => { token = tk; },
     "expired-callback": () => { token = undefined; },
   });
-  if (window.turnstile) render();
+  if (turnstileApi()) render();
   else {
     window.__tsOnload = render;
     document.head.append(el("script", { src: "https://challenges.cloudflare.com/turnstile/v0/api.js?onload=__tsOnload&render=explicit", async: true, defer: true }));
@@ -211,7 +215,7 @@ export function mountTurnstile(container) {
 }
 
 export function resetTurnstile() {
-  if (window.turnstile) window.turnstile.reset();
+  try { turnstileApi()?.reset(); } catch (_) { /* ignore */ }
 }
 
 // ---------- Visa (status of residence) helpers ----------
