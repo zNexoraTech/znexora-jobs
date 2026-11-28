@@ -11,7 +11,7 @@
 //   CRON_SECRET       same one used by send-job-alerts / import-feeds
 //   ALLOWED_ORIGINS   your site origin(s), e.g. "https://znexoratech.github.io"
 //   JOOBLE_API_KEY    optional; without it the Jooble step is skipped
-//   JOOBLE_HOST       optional, default "jp.jooble.org" (use the host your key was issued for)
+//   JOOBLE_HOST       optional, default "ja.jooble.org" (use the host your key was issued for)
 import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { runFeed, Feed } from "../_shared/feeds.ts";
 import { joobleToRow, JoobleJob, CollectedRow } from "../_shared/jooble.ts";
@@ -161,7 +161,7 @@ async function saveCollected(db: SupabaseClient, rows: CollectedRow[], s: Settin
 async function runJooble(db: SupabaseClient, s: Settings, t: Totals, details: Record<string, unknown>) {
   const key = Deno.env.get("JOOBLE_API_KEY");
   if (!key) { details.jooble = "skipped: JOOBLE_API_KEY not set"; return; }
-  const host = (Deno.env.get("JOOBLE_HOST") || "jp.jooble.org").replace(/[^a-z0-9.-]/gi, "");
+  const host = (Deno.env.get("JOOBLE_HOST") || "ja.jooble.org").replace(/[^a-z0-9.-]/gi, "");
   if (!/(^|\.)jooble\.org$/i.test(host)) { details.jooble = "error: JOOBLE_HOST must be a jooble.org host"; return; }
 
   const { data: searches } = await db.from("collector_searches").select("id, keywords, location")
