@@ -235,7 +235,8 @@ Deno.serve(async (req) => {
     trigger = "manual";
   }
 
-  const { data: s } = await db.from("collector_settings").select("*").eq("id", 1).maybeSingle();
+  const { data: s, error: sErr } = await db.from("collector_settings").select("*").eq("id", 1).maybeSingle();
+  if (sErr) return json({ error: `database: ${sErr.code ?? ""} ${sErr.message} (run migration 007)` }, 500, headers);
   if (!s) return json({ error: "run migration 006 first" }, 500, headers);
   const { data: run } = await db.from("collector_runs").insert({ trigger }).select("id").single();
 
