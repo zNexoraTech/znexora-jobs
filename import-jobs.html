@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Add jobs | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <a href="dashboard.html" data-i18n="common.back">Back</a>
+  <h1 data-i18n="imp.title">Add jobs</h1>
+  <div id="msg"></div>
+
+  <section class="card">
+    <h2 data-i18n="multi.title">Add several jobs at once</h2>
+    <p data-i18n="multi.intro">Fill in one card per job. Use "Copy" to start a similar job quickly. Each job is sorted into its industry automatically, shown on the matching category page, shared to the matching social channels, and emailed to job seekers whose alerts match.</p>
+    <p id="multi-note" class="msg info" data-i18n="post.review_note">Your first job is checked by our team before it goes live. After that, verified employers publish instantly.</p>
+    <form id="multi-form">
+      <div id="cards"></div>
+      <div class="row u-my12">
+        <button type="button" id="add-card" class="secondary" data-i18n="multi.add">Add another job</button>
+        <span class="spacer"></span>
+        <label class="inline"><input type="checkbox" id="multi-confirm" required> <span data-i18n="post.confirm">I confirm this job follows the posting rules, pays at least the minimum wage, and I will check every applicant's work permission.</span></label>
+      </div>
+      <button type="submit" id="multi-submit" data-i18n="multi.submit">Publish jobs</button>
+    </form>
+  </section>
+
+  <section class="card u-mt16" id="feeds-card">
+    <h2 data-i18n="imp.feeds_title">Import automatically from your careers page</h2>
+    <p data-i18n="imp.feeds_intro">If your careers page uses Google for Jobs markup (JobPosting), or you have an XML job feed, add its address. We check it every day: new jobs are added, changed jobs updated, and removed jobs closed.</p>
+    <div id="feeds-msg"></div>
+    <div id="feeds"></div>
+    <form id="feed-form" class="row u-my12">
+      <input type="url" id="feed-url" required placeholder="https://www.example.co.jp/careers" class="u-flex1">
+      <select id="feed-format" aria-label="Format"><option value="auto" data-i18n="imp.format_auto">Detect automatically</option><option value="jsonld">JobPosting (HTML)</option><option value="xml">XML feed</option></select>
+      <button type="submit" data-i18n="imp.add_feed">Add feed</button>
+    </form>
+    <p class="hint" data-i18n="imp.feeds_note">Only add pages you own or have permission to use. Verified companies only, up to 3 feeds.</p>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="assets/js/pages/import-jobs.js"></script>
+</body>
+</html>

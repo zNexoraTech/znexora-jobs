@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Sign up | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <div class="card form-narrow">
+    <h1 data-i18n="nav.signup">Sign up</h1>
+    <div id="msg"></div>
+    <form id="signup-form">
+      <label data-i18n="auth.i_am">I am</label>
+      <label class="inline"><input type="radio" name="role" value="seeker" checked> <span data-i18n="auth.role_seeker">Looking for a job</span></label>
+      <label class="inline"><input type="radio" name="role" value="employer"> <span data-i18n="auth.role_employer">An employer</span></label>
+      <label for="name" data-i18n="auth.display_name">Name</label>
+      <input type="text" id="name" required maxlength="80" autocomplete="name">
+      <label for="email" data-i18n="auth.email">Email</label>
+      <input type="email" id="email" required autocomplete="email">
+      <label for="password" data-i18n="auth.password">Password</label>
+      <input type="password" id="password" required minlength="10" autocomplete="new-password">
+      <p class="hint" data-i18n="auth.password_hint">At least 10 characters.</p>
+      <label class="inline"><input type="checkbox" id="agree" required> <span data-i18n="auth.agree_terms">I agree to the Terms of Service and Privacy Policy</span></label>
+      <div id="captcha-box" class="u-my12"></div>
+      <button type="submit" data-i18n="auth.signup_btn">Create account</button>
+    </form>
+    <p class="meta"><span data-i18n="auth.have_account">Already have an account?</span> <a href="login.html" data-i18n="nav.login">Log in</a></p>
+  </div>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="assets/js/pages/signup.js"></script>
+</body>
+</html>

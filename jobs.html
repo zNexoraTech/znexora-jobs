@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Jobs | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <h1 id="jobs-h" data-i18n="nav.jobs">Jobs</h1>
+  <form id="filters" class="filters">
+    <div><label for="q" data-i18n="filter.keyword">Keyword</label><input type="text" id="q" name="q" maxlength="60"></div>
+    <div><label for="cat" data-i18n="cat.label">Industry</label><select id="cat" name="cat"></select></div>
+    <div><label for="pref" data-i18n="filter.prefecture">Prefecture</label><select id="pref" name="pref"></select></div>
+    <div><label for="type" data-i18n="filter.job_type">Job type</label><select id="type" name="type"></select></div>
+    <div><label for="visa" data-i18n="filter.visa">My visa type</label><select id="visa" name="visa"></select></div>
+    <div><label for="jp" data-i18n="filter.japanese">Japanese level required (max)</label><select id="jp" name="jp"></select></div>
+    <div><button type="submit" data-i18n="filter.apply">Search</button></div>
+  </form>
+  <div class="row alert-actions">
+    <p id="count" class="meta"></p><span class="spacer"></span>
+    <button type="button" id="save-alert" class="secondary small" data-i18n="alerts.save">Email me new jobs like these</button>
+    <a class="btn secondary small" href="share-job.html" data-i18n="nav.share_job">Share a job you saw</a>
+  </div>
+  <div id="alert-msg"></div>
+  <div id="results" class="job-list"></div>
+  <section id="other-sites" class="hidden u-mt32" aria-labelledby="other-h">
+    <div class="section-head"><h2 id="other-h" data-i18n="other.title">More jobs from other sites</h2></div>
+    <p class="hint" data-i18n="other.note">These jobs are on other websites. We don't check them: read carefully and never pay any fee.</p>
+    <div id="other-list" class="job-list"></div>
+  </section>
+  <div class="row u-mt16"><button id="prev" class="secondary" data-i18n="common.prev">Previous</button><button id="next" class="secondary" data-i18n="common.next">Next</button></div>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="assets/js/pages/jobs.js"></script>
+</body>
+</html>

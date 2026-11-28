@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://esm.sh https://challenges.cloudflare.com; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="noindex, nofollow"><!-- REMOVE at public launch -->
+<title>Job details | ZNexora Jobs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<header id="site-header" class="site-header"></header>
+<main class="wrap">
+  <div id="msg"></div>
+  <article id="job" class="card job-detail hidden"></article>
+  <section id="apply" class="card hidden u-mt16">
+    <h2 data-i18n="job.apply_title">Apply for this job</h2>
+    <div id="apply-msg"></div>
+    <form id="apply-form">
+      <label for="message" data-i18n="job.message">Message to the employer</label>
+      <textarea id="message" maxlength="3000"></textarea>
+      <label for="cv" data-i18n="job.cv_optional">CV (PDF, max 5 MB, optional)</label>
+      <input type="file" id="cv" accept="application/pdf">
+      <p class="hint" data-i18n="job.cv_hint">Do not include your residence card, passport or Myanmar ID number in your CV.</p>
+      <button type="submit" data-i18n="job.apply_btn">Send application</button>
+    </form>
+  </section>
+  <section id="report" class="card hidden u-mt16">
+    <details>
+      <summary data-i18n="job.report">Report this job</summary>
+      <div id="report-msg"></div>
+      <form id="report-form">
+        <label for="reason" data-i18n="job.report_reason">Reason</label>
+        <select id="reason"></select>
+        <label for="details" data-i18n="job.report_details">Details (optional)</label>
+        <textarea id="details" maxlength="2000"></textarea>
+        <button type="submit" class="danger" data-i18n="job.report_send">Send report</button>
+      </form>
+    </details>
+  </section>
+</main>
+<footer id="site-footer" class="site-footer"></footer>
+<script type="module" src="assets/js/pages/job.js"></script>
+</body>
+</html>
